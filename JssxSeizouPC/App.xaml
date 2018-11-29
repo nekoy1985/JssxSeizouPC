@@ -1,0 +1,38 @@
+﻿<Application x:Class="JssxSeizouPC.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:JssxSeizouPC"
+             StartupUri="Login.xaml" Startup="Application_Startup">
+    <Application.Resources>
+        <SolidColorBrush x:Key="color" Color="SkyBlue" />
+        <Style x:Key="window" TargetType="Window">
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="AllowsTransparency" Value="true" />
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="WindowStyle" Value="None" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Window">
+                        <Border BorderBrush="{DynamicResource color}" BorderThickness="3" CornerRadius="5" Padding="4">
+                            <Border BorderBrush="{DynamicResource color}" BorderThickness="3" CornerRadius="5" Background="{DynamicResource color}">
+                                <Border BorderBrush="#1000" BorderThickness="3" CornerRadius="5" Padding="6">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#3fff" Offset="0.5" />
+                                            <GradientStop Color="#1666" Offset="0.5" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <ContentPresenter />
+                                </Border>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="#AAFFFFFF" />
+        </Style>
+
+    </Application.Resources>
+</Application>

@@ -1,0 +1,17 @@
+﻿<Window x:Class="JssxSeizouPC.Login"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JssxSeizouPC"
+        Background="Black"
+        mc:Ignorable="d"
+        Title="登陆" Height="300" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen"  Topmost="True" Icon="JssxSeizouPC.ico" ResizeMode="NoResize" >
+    <Grid>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="131*"/>
+        </Grid.RowDefinitions>
+        <ComboBox x:Name="Cbx_Line" Margin="50,100,50,100" FontSize="50" SelectionChanged="Cbx_Line_SelectionChanged"  Grid.Row="0" Grid.Column="0" />
+    </Grid>
+</Window>
