@@ -1,0 +1,58 @@
+﻿<Window x:Class="JssxSeizouPC.ScrapRecord"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:my="clr-namespace:JssxSeizouPC"
+        mc:Ignorable="d"
+        Title="报废品记录" Height="800" Width="800"  WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="2*"/>
+
+        </Grid.RowDefinitions>
+        <Popup Name="popNumKeyboard" StaysOpen="False" DockPanel.Dock="Bottom" PopupAnimation="Scroll"  AllowsTransparency="True">
+            <Border BorderBrush="Black" BorderThickness="1" Padding="4" Width="300" Height="280" Opacity="0.8">
+                <my:NumericKeyboard x:Name="grqNumKB" />
+            </Border>
+        </Popup>
+        <DataGrid FontSize="60" EnableRowVirtualization ="False" CanUserAddRows="False"  DataContextChanged="DG_Inputwindows_DataContextChanged"  x:Name="DG_Inputwindows"   Margin="10,10,10,10" AutoGenerateColumns="False" >
+           
+            <DataGrid.Columns >                 
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label MaxWidth="500" >
+                                <TextBlock Foreground="#03ffea"  TextWrapping="Wrap" Text="{Binding CarType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
+                            </Label>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Foreground="#03ffea" Width="300" HorizontalAlignment="Center" PreviewMouseUp="textBox_PreviewMouseUp" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="Background" Value="#001f55"></Setter>
+                    <Setter Property="Foreground" Value="#17acae"></Setter>
+                    <Setter Property="BorderThickness" Value="1"></Setter>
+                    <Setter Property="BorderBrush" Value="#03ffea"></Setter>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="#001f55" />                   
+                    <Setter Property="Foreground" Value="#03ffea" />
+                </Style>
+            </DataGrid.RowStyle>
+        </DataGrid>
+        <Button x:Name="Btn_Submit" Content="提交数据" FontSize="60" HorizontalAlignment="Left" Margin="265,33,0,0" Grid.Row="1" VerticalAlignment="Top" Width="244" Height="93" Click="Btn_Submit_Click"  />
+    </Grid>
+</Window>

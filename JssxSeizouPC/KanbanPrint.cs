@@ -31,7 +31,7 @@ namespace JssxSeizouPC
         public static string GetData(string UniqueID, string InStockNumber, string WorkShift, string PrintNo, string Label, string SN, string Lines)
         {
             DataTable Dt = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select distinct TrayVolume as 托收容,EuCode as 包装,IsPrinted^1 as 打印,line as 生产线,CONVERT(varchar(10),PlanTime, 23) as 计划日期,a.JSSXInsideCode as 背番,iif(EUCode<>0 and EUCode<>9 and EUCode<>10,KanbanAmount*TrayVolume,KanbanAmount) as 数量,a.JSSXCode as 社番,a.CustomerCode as 客番,c.CustomerInsideCode as 客户背番,InStockNumber as 指示单号,b.CreateTime as 创建时间,Creator as 创建者,[Version] as 版本,KanbanAmount as 需求看板,TrayVolume as 收容数,(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord) as 流水号,c.UniqueID as 主键,iif(IsRepeated=1,1301,iif(IsRepeated=2,0101,d.CategoryNumber)) as 客户编码, (case c.TrayType when '量产' then 'B01L' when '补用品' then 'B01B' when '单纳品' then 'B01D' when '样品' then 'B01Y' when '特殊' then 'B01T' else 'ERROR' end) as 看板类型,CarType as 车型,ProName as 品名,iif(f.Name='广本' or f.Name='东本' ,'本田',f.Name) as 客户名称,Amount% Volume as 端数,EuCode as 箱种,EuName as 容器名称,iif(FreeOfCharge='True',1,0) as 有无偿,a.Note as 备注,g.WHCode as 中间仓编号,g.WHName as 仓库名称,h.WHCode as 中继仓编号,h.WHName as 中继仓名,e.Redistribute as 出货便名,e.CustomerCode as JCC客户代码,iif(LabelType='客户',1,0) as 销售模式 from [dbo].[JSSX_Stock_In_Detailed] as a left join [dbo].[JSSX_Stock_in] as b on a.instocknumber=b.Number  left join JSSX_Products c on a.UniqueID=c.UniqueID left join JSSX_Products_Category_Detailed d on d.UniqueID=a.UniqueID left join JSSX_Products_Category e on d.CategoryNumber=e.Number left join JSSX_Custom f on left(e.Number,2)=f.Number left join JSSX_WareHouse g on e.Warehouse = g.WHCode left join JSSX_WareHouse h on g.IntermediateWarehouse = h.WHCode where  InStockNumber= '" + InStockNumber + "' and a.UniqueID ='" + UniqueID + "'  and d.State is null and c.Revoked=0 and isdelete =0 ").Tables[0];
-            string SalesMode, EuName, RelayStation, WHLocation, Redistribute, Companynumber, WHCodeb, CustomerCode, Warehouse, WHName, EuCode, CustomerInsideCode, JCCCustomerNo, TrayVolume,  JssxCode, JssxInsideCode, Amount, SerialNo, Volume, CustomerNo, UniqueNo, KanbanNo, TrayType, CData, CarType, ProName, Line, PlanTime, CustomerName, Complement, ComplementT, KanbanAoumt, FOC, sNote;
+            string SalesMode, EuName, RelayStation, WHLocation, Redistribute, Companynumber, WHCodeb, CustomerCode, Warehouse, WHName, EuCode, CustomerInsideCode, JCCCustomerNo, TrayVolume,  JssxCode, JssxInsideCode, Amount, SerialNo, Volume, CustomerNo, UniqueNo, KanbanNo, TrayType, CData, CarType, ProName, Line, PlanTime, CustomerName, Complement, KanbanAoumt, FOC;
 
             TrayVolume = Dt.Rows[0]["托收容"].ToString();
             EuCode = Dt.Rows[0]["包装"].ToString();
@@ -216,6 +216,14 @@ namespace JssxSeizouPC
             {
                 sType = "4";
             }
+            else if (TrayType.Substring(3, 1) == "Y")
+            {
+                sType = "5";
+            }
+            else
+            {
+                sType = "0";
+            }
             return "F03JSSX" + Companynumber.PadRight(8, ' ') + TrayType.PadRight(6, ' ') + UniqueNo.PadRight(10, ' ') + "0001" + WorkShift + FOC + WHCodeb.PadRight(5, ' ') + space.PadRight(16, ' ') + space.PadRight(11, ' ') + Numerator.PadLeft(4, '0') + Denominator.PadLeft(4, '0') + SerialNo.PadLeft(8, '0') + JssxInsideCode.PadRight(4, ' ') + JssxCode.PadRight(20, ' ') + Volume.PadLeft(4, '0') + Warehouse.PadRight(5, ' ') + CustomerNo.PadLeft(10, ' ') + EuCode.PadLeft(2, '0') + space.PadRight(11, ' ') + CustomerCode.PadRight(20, ' ') + CustomerInsideCode.PadRight(4, ' ') + JCCCustomerNo.PadRight(8, ' ') + sType + SalesMode + space.PadRight(55, ' ') + InStockNumber.PadRight(20, ' ');
         }
 
@@ -292,6 +300,7 @@ namespace JssxSeizouPC
             ICellStyle style = workbook.CreateCellStyle();
             style.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
             style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            style.ShrinkToFit = true;
             //style.BorderBottom = BorderStyle.Thin;
             //style.BorderLeft = BorderStyle.Thin;
             //style.BorderRight = BorderStyle.Thin;
@@ -305,6 +314,7 @@ namespace JssxSeizouPC
             style2.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
             style2.FillForegroundColor = HSSFColor.Black.Index;
             style2.FillPattern = FillPattern.SolidForeground;
+            style2.ShrinkToFit = true;
             IFont Font2 = workbook.CreateFont();
             Font2.Boldweight = (short)FontBoldWeight.Bold;
             Font2.FontHeightInPoints = 60;
@@ -314,6 +324,7 @@ namespace JssxSeizouPC
             ICellStyle style3 = workbook.CreateCellStyle();
             style3.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
             style3.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            style3.ShrinkToFit = true;
             IFont Font3 = workbook.CreateFont();
             Font3.Boldweight = (short)FontBoldWeight.Bold;
             Font3.FontHeightInPoints = 40;
@@ -322,6 +333,7 @@ namespace JssxSeizouPC
             ICellStyle style4 = workbook.CreateCellStyle();
             style4.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
             style4.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            style4.ShrinkToFit = true;
             IFont Font4 = workbook.CreateFont();
             Font4.Boldweight = (short)FontBoldWeight.Bold;
             Font4.FontHeightInPoints = 20;
@@ -332,6 +344,7 @@ namespace JssxSeizouPC
             style5.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
             style5.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
             style5.BorderLeft = BorderStyle.Thin;
+            style5.ShrinkToFit = true;
             IFont Font5 = workbook.CreateFont();
             Font5.Boldweight = (short)FontBoldWeight.Bold;
             Font5.FontHeightInPoints = 20;
@@ -341,21 +354,14 @@ namespace JssxSeizouPC
             style6.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
             style6.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center; 
             style6.BorderTop = BorderStyle.Thin;
+            style6.WrapText = true;
+            style6.ShrinkToFit = true;
             IFont Font6 = workbook.CreateFont();
             Font6.Boldweight = (short)FontBoldWeight.Bold;
-            Font6.FontHeightInPoints = 13;
+            Font6.FontHeightInPoints = 10;
             style6.SetFont(Font6);
 
 
-            ICellStyle style7 = workbook.CreateCellStyle();
-            style7.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
-            style7.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
-            style7.WrapText = true;
-            style7.BorderTop = BorderStyle.Thin;
-            IFont Font7 = workbook.CreateFont();
-            Font7.Boldweight = (short)FontBoldWeight.Bold;
-            Font7.FontHeightInPoints = 9;
-            style7.SetFont(Font7);
 
             ISheet sheet = workbook.GetSheet(Str_SheetNo);
             HSSFPatriarch patriarch = (HSSFPatriarch)sheet.CreateDrawingPatriarch();
@@ -385,7 +391,15 @@ namespace JssxSeizouPC
             sheet.GetRow(12).GetCell(6).CellStyle = style4;
             //F15
             sheet.GetRow(15).CreateCell(6).SetCellValue(CarType);
-            sheet.GetRow(15).GetCell(6).CellStyle = style4;
+            if (CarType.Length >= 6)
+            {
+                sheet.GetRow(15).GetCell(6).CellStyle = style6;
+            }
+            else
+            {
+                sheet.GetRow(15).GetCell(6).CellStyle = style5;
+            }
+
             //L20
             sheet.GetRow(20).CreateCell(12).SetCellValue(InStockNumber.Substring(4, 13));
             sheet.GetRow(20).GetCell(12).CellStyle = style;
@@ -420,7 +434,7 @@ namespace JssxSeizouPC
             sheet.GetRow(12).GetCell(50).CellStyle = style;
             //AX15
             sheet.GetRow(18).CreateCell(44).SetCellValue(label);
-            sheet.GetRow(18).GetCell(44).CellStyle = style7;
+            sheet.GetRow(18).GetCell(44).CellStyle = style6;
 
             using (FileStream fileStream = File.Open("Normal\\" + InStockNumber + "_" + JssxInsideCode + "_" + Pag.ToString("000") + ".xls", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
             {

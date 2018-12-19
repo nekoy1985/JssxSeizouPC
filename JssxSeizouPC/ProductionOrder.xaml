@@ -1,0 +1,67 @@
+﻿<Window x:Class="JssxSeizouPC.ProductionOrder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JssxSeizouPC"
+        mc:Ignorable="d"
+        Title="ProductionOrder"  Height="746" Width="1024" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="75*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="75*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="40*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <!--<TextBox x:Name="textBox"  Margin="0,0,0,0" TextWrapping="Wrap" Text="TextBox"  Grid.Column="2" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>-->
+        <ComboBox x:Name="Cbx_WorkShift" Grid.Column="4"  Margin="0,0,0,0" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectionChanged="Cbx_WorkShift_SelectionChanged"/>
+
+
+        <DataGrid x:Name="DG_Production" Grid.Column="6"  Margin="0,0,0,0" Grid.RowSpan="3" AutoGenerateColumns="False"  Grid.Row="3" Grid.ColumnSpan="4">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="UniqueID" IsReadOnly="True" Visibility="Collapsed" FontSize="20"  Binding="{Binding UniqueID}"/>
+                <DataGridTextColumn Header="背番" IsReadOnly="True"  FontSize="20"  Binding="{Binding 背番}"/>
+                <DataGridTextColumn Header="类型" IsReadOnly="True"  FontSize="20"  Binding="{Binding 类型}"/>
+                <DataGridTextColumn Header="车型" IsReadOnly="True"  FontSize="20"  Binding="{Binding 车型}"/>
+                <DataGridTextColumn Header="生产数"   FontSize="20"  Binding="{Binding 生产数}" />
+                <DataGridTextColumn Header="物流已送"  IsReadOnly="True"  FontSize="20"  Binding="{Binding 物流已送}" >
+
+                </DataGridTextColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="DG_Now" IsReadOnly="True" Grid.ColumnSpan="4" Margin="0,0,0,0" Grid.Row="3" Grid.Column="1"/>
+        <DataGrid x:Name="DG_Next" IsReadOnly="True" Grid.ColumnSpan="4" Margin="0,0,0,0" Grid.Row="5" Grid.Column="1" Grid.RowSpan="1"/>
+        <Label x:Name="label" Grid.ColumnSpan="4" Content="日程发布（以上选定班次）" FontSize="20" Foreground="Black" Grid.Column="1"  Margin="0,0,0,0" Grid.Row="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label x:Name="Lab_Label" Grid.ColumnSpan="4" Content="本  次  排  程" Foreground="Black"  Grid.Column="6"  Margin="0,0,0,0" FontSize="40" Grid.Row="1" Grid.RowSpan="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label x:Name="label2" Content="日期" Grid.Column="1"  Margin="0,0,0,0" Grid.Row="1" Foreground="Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label x:Name="label3" Content="班次" Grid.Column="3"  Margin="0,0,0,0" Grid.Row="1" Foreground="Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label x:Name="label4" Grid.ColumnSpan="3" Content="日程发布（右边日期之后的全部）" FontSize="20" Foreground="Black" Grid.Column="1"  Margin="0,0,0,0" Grid.Row="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <ComboBox x:Name="Cbx_Date" Grid.Column="2" Margin="0,0,0,0" Grid.Row="1" SelectionChanged="Cbx_Date_SelectionChanged"/>
+        <ComboBox x:Name="Cbx_Date2" Grid.Column="4" Margin="0,0,0,0" Grid.Row="4" SelectionChanged="Cbx_Date2_SelectionChanged" />
+
+        <Button x:Name="Btn_UpDate" Content="提交" Grid.Column="9"  Margin="0,0,0,0" Grid.Row="6" Click="Btn_UpDate_Click" Height="36" VerticalAlignment="Top" />
+        <Button x:Name="Btn_Del" Content="移除" Grid.Column="8"  Margin="0,0,0,0" Grid.Row="6"  Height="36" VerticalAlignment="Top" Click="Btn_Del_Click" />
+        <Button x:Name="Btn_Add" Content="添加" Grid.Column="4"  Margin="0,0,0,0" Grid.Row="6" Click="Btn_Add_Click" />
+        <Button x:Name="Btn_Up" Content="上移↑" Grid.Column="6"  Margin="0,0,0,0" Grid.Row="6" Click="Btn_Up_Click" />
+        <Button x:Name="Btn_Down" Content="下移↓" Grid.Column="7"  Margin="0,0,0,0" Grid.Row="6" Click="Btn_Down_Click" />
+
+    </Grid>
+</Window>

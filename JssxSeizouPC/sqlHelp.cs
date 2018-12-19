@@ -1,9 +1,7 @@
-﻿using System.Data;
-using System.Data.SqlClient;
-using JssxSeizouPC;
+﻿using JssxSeizouPC;
 using System;
-using System.Threading;
-using System.Windows;
+using System.Data;
+using System.Data.SqlClient;
 
 
 

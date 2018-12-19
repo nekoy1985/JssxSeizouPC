@@ -32,6 +32,7 @@ namespace JssxSeizouPC
 
         protected override void OnStartup(StartupEventArgs e)
         {
+
             SplashScreen s = new SplashScreen("Strat.jpg");
             s.Show(false);
             s.Close(new TimeSpan(0, 0, 5));

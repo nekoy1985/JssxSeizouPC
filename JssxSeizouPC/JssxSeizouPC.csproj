@@ -67,7 +67,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
@@ -139,6 +139,9 @@
     <Compile Include="ErrorWindow.xaml.cs">
       <DependentUpon>ErrorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Feedback.xaml.cs">
+      <DependentUpon>Feedback.xaml</DependentUpon>
+    </Compile>
     <Compile Include="KanbanPrint.cs" />
     <Compile Include="LoadingWait.xaml.cs">
       <DependentUpon>LoadingWait.xaml</DependentUpon>
@@ -147,6 +150,21 @@
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
     <Compile Include="MyLog.cs" />
+    <Compile Include="NGReason.xaml.cs">
+      <DependentUpon>NGReason.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NumericKeyboard.xaml.cs">
+      <DependentUpon>NumericKeyboard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProductionOrder.xaml.cs">
+      <DependentUpon>ProductionOrder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScrapRecord.xaml.cs">
+      <DependentUpon>ScrapRecord.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialHandling.xaml.cs">
+      <DependentUpon>SpecialHandling.xaml</DependentUpon>
+    </Compile>
     <Compile Include="sqlHelp.cs" />
     <Compile Include="SQLiteHelper.cs" />
     <Compile Include="ThemeManager.cs" />
@@ -159,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Feedback.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -182,6 +204,26 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="NGReason.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NumericKeyboard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProductionOrder.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ScrapRecord.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpecialHandling.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
