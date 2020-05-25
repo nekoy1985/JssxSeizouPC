@@ -1217,6 +1217,16 @@ namespace JssxSeizouPC
             }
             var a = this.Dg_Show.SelectedItem;
             var b = a as DataRowView;
+            DataTable Ds_ShowLabel = new DataTable();
+            Ds_ShowLabel.Clear();
+            Ds_ShowLabel.Columns.Add("ScanResult", typeof(string));
+            Ds_ShowLabel.Columns.Add("Status", typeof(string));
+            Ds_ShowLabel.Columns.Add("KanbanNo", typeof(string));
+            Ds_ShowLabel.Columns.Add("InStockNumber", typeof(string));
+            Ds_ShowLabel.Columns.Add("UniqueID", typeof(string));
+            Thread Completed = new Thread(Show_completed);
+            int iQuantityCompletion = 0;//此看板的数据 
+
             if (b == null)
             {
                 return;
@@ -1224,11 +1234,48 @@ namespace JssxSeizouPC
             NGReason NG = new NGReason(b["ScanResult"].ToString(), Lines);
             NG.ShowDialog();
             if (NG.bIsok)
-            {
-                ShowMessage(b["ScanResult"].ToString() + "退库成功" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
+            { 
                 sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "update JSSX_ScanRecord_Seizou set Status='SC' where ScanResult='" + b["ScanResult"].ToString() + "';update top(1) JSSX_Stock_In_Kanban set QuantityCompletion-=1,Isfinish=0, CompleteTime=(CONVERT([nvarchar](20),getdate(),(120))),Status='SP' where KanbanNo= '" + b["KanbanNo"].ToString() + "'  ;update JSSX_Stock_ShippingDepartment set Status='SP' WHERE Series='" + b["KanbanNo"].ToString() + "' ;insert into ErrorLog (sMessage,sLevel,sLogger,sDepartment,sException) values( '执行了【退库】操作','SC','" + UserName + "','" + Lines + "','" + b["ScanResult"].ToString() + "')");
                 b.Delete();
                 Tb_Completed.Text = Dg_Show.Items.Count.ToString() + "/" + Amount.ToString();
+                string Res = b["ScanResult"].ToString();
+                DataSet Os = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select top(1) KanbanNo from JSSX_ScanRecord_Seizou where ScanResult = '" + Res + "' and Status = 'OK' order by id desc");
+                if (Os != null && Os.Tables.Count != 0)
+                {
+                    string sKanbanNo = Os.Tables[0].Rows[0]["KanbanNo"].ToString();
+                    bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "update JSSX_ScanRecord_Seizou set Status='SC' where ScanResult='" + Res + "';update top(1) JSSX_Stock_In_Kanban set QuantityCompletion-=1,Isfinish=0, CompleteTime=(CONVERT([nvarchar](20),getdate(),(120))),Status='SP' where KanbanNo= '" + sKanbanNo + "'  ;update JSSX_Stock_ShippingDepartment set Status='SP' WHERE Series='" + sKanbanNo + "' ;insert into ErrorLog (sMessage,sLevel,sLogger,sDepartment,sException) values( '执行了【退库】操作','SC','" + UserName + "','" + Lines + "','" + Res + "')");
+                    if (!bTran)
+                    {
+                        Speaker("解除绑定失败！", 3);
+                        ShowMessage("解除绑定失败！" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
+                        return;
+                    }
+                    //DS_30Days.Tables[0].Rows.Remove(DS_30Days.Tables[0].Rows.Find(Res));//删除表里的数据
+                    DataRow[] arrRows = DS_30Days.Tables[0].Select("ScanResult='" + Res + "'");
+                    foreach (DataRow row in arrRows)
+                    {
+                        row["Status"] = "SC";
+                    }
+                    Back.Play();
+                    ShowMessage(Res + "退库成功" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
+                    iQuantityCompletion = DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK'").Length;//此看板的数据
+                    Ds_ShowLabel.Clear();
+                    foreach (DataRow DR in DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK' "))
+                    {
+                        Ds_ShowLabel.ImportRow(DR);
+                    }
+                    Dg_Show.ItemsSource = Ds_ShowLabel.DefaultView;
+                    Tb_Completed.Text = iQuantityCompletion + "/" + Amount.ToString();
+
+                    if (iQuantityCompletion == Amount)
+                    {
+                        Completed.Start();
+                    }
+                }
+                else
+                {
+                    ErrorSilen("【铭板】已经解除绑定关系，或者根本没有绑定关系，请核对。", "3");
+                }
             }
             else
             {
