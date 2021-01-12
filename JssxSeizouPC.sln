@@ -1,22 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JssxSeizouPC", "JssxSeizouPC\JssxSeizouPC.csproj", "{AE683A42-E6B5-433D-B6DA-EF018A61EA86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Debug|x86.ActiveCfg = Debug|x86
+		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Debug|x86.Build.0 = Debug|x86
 		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Release|x86.ActiveCfg = Release|x86
+		{AE683A42-E6B5-433D-B6DA-EF018A61EA86}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2937A1ED-D9C8-4EFD-B318-FA91294263E7}
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,12 @@ namespace JssxSeizouPC
         Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         public Login()
         {
+            TimeSpan nowDt = DateTime.Now.TimeOfDay;
+            TimeSpan workStartDT = DateTime.Parse("14:00").TimeOfDay;
+            TimeSpan workEndDT = DateTime.Parse("15:00").TimeOfDay;
+            if (nowDt > workStartDT && nowDt < workEndDT)
+            {
+            }
             Mylog.Error("打开");
             System.Diagnostics.Process[] myProcesses = System.Diagnostics.Process.GetProcessesByName("JssxSeizouPC");
             if (myProcesses.Length > 1)
@@ -27,37 +34,35 @@ namespace JssxSeizouPC
                 }
             }
             InitializeComponent();
-            GetLine();
+
         }
 
 
-        private void GetLine()
+
+        private void Btn_Line_Click(object sender, RoutedEventArgs e)
+        { 
+            Button Bt = (Button)sender;
+            Mylog.Error("登陆成功");
+            string sLine = int.Parse(Bt.ToolTip.ToString()).ToString("00");
+            config.AppSettings.Settings["Lines"].Value = sLine;
+            DataSet LineInfo = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text,
+                "select LineCode,bIsNewVersion,Devices,bIsClickable,bIsNeedOK,cIP1 from [dbo].[JSSX_Line] where LineNumber='" + sLine + "' ");
+            config.AppSettings.Settings["LinesName"].Value = LineInfo.Tables[0].Rows[0]["LineCode"].ToString();
+            config.AppSettings.Settings["Devices"].Value = LineInfo.Tables[0].Rows[0]["Devices"].ToString();
+            config.AppSettings.Settings["bIsNewVersion"].Value = LineInfo.Tables[0].Rows[0]["bIsNewVersion"].ToString();
+            config.AppSettings.Settings["bIsClickable"].Value = LineInfo.Tables[0].Rows[0]["bIsClickable"].ToString();
+            config.AppSettings.Settings["bIsNeedOK"].Value = LineInfo.Tables[0].Rows[0]["bIsNeedOK"].ToString();
+            config.AppSettings.Settings["PrintIP"].Value = LineInfo.Tables[0].Rows[0]["cIP1"].ToString();
+            config.Save();
+            this.Hide();
+            MainWindow lo = new MainWindow();
+            lo.Show();
+        }
+
+        private void Btn_Close_Click(object sender, RoutedEventArgs e)
         {
-            DataSet ds = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select LineCode as  line,LineNumber as LineNumber from [dbo].[JSSX_Line] where cArea = '后工段' order by LineNumber ");
-            Cbx_Line.ItemsSource = ds.Tables[0].DefaultView;
-            Cbx_Line.DisplayMemberPath = "line";
-            Cbx_Line.SelectedValuePath = "LineNumber";
-
+            Mylog.Error("退出程序");
+            Environment.Exit(0);
         }
-        private void Cbx_Line_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (Cbx_Line.SelectedIndex < 0)
-            {
-                MessageBox.Show("请先选择客户！");
-                return;
-            }
-            else
-            {
-                Mylog.Error("登陆成功");
-                config.AppSettings.Settings["Lines"].Value = Cbx_Line.SelectedValue.ToString();
-                config.AppSettings.Settings["LinesName"].Value = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select LineCode  from [dbo].[JSSX_Line]   where LineNumber='" + Cbx_Line.SelectedValue.ToString() + "' ").Tables[0].Rows[0]["LineCode"].ToString();
-                config.AppSettings.Settings["Devices"].Value = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select Devices as  Devices from [dbo].[JSSX_Line] where LineNumber='" + Cbx_Line.SelectedValue.ToString() + "' ").Tables[0].Rows[0]["Devices"].ToString();
-                config.Save();
-                this.Hide();
-                MainWindow lo = new MainWindow();
-                lo.Show();
-            }
-        }
-
     }
 }

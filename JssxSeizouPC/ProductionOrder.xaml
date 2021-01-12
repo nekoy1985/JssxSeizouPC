@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="ProductionOrder"  Height="746" Width="1024" >
     <Grid>
+       
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="10*"/>
@@ -33,17 +34,47 @@
         <!--<TextBox x:Name="textBox"  Margin="0,0,0,0" TextWrapping="Wrap" Text="TextBox"  Grid.Column="2" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>-->
         <ComboBox x:Name="Cbx_WorkShift" Grid.Column="4"  Margin="0,0,0,0" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectionChanged="Cbx_WorkShift_SelectionChanged"/>
 
-
-        <DataGrid x:Name="DG_Production" Grid.Column="6"  Margin="0,0,0,0" Grid.RowSpan="3" AutoGenerateColumns="False"  Grid.Row="3" Grid.ColumnSpan="4">
+        <Popup Name="popNumKeyboard" StaysOpen="False" DockPanel.Dock="Bottom" PopupAnimation="Scroll"  AllowsTransparency="True">
+            <Border BorderBrush="Black" BorderThickness="1" Padding="4" Width="300" Height="280" Opacity="0.8">
+                <local:NumericKeyboard x:Name="grqNumKB" />
+            </Border>
+        </Popup>
+        <DataGrid x:Name="DG_Production" Grid.Column="6" SelectionChanged="DG_Production_SelectionChanged"  Margin="0,0,0,0" Grid.RowSpan="3" AutoGenerateColumns="False"  Grid.Row="3" Grid.ColumnSpan="4">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="UniqueID" IsReadOnly="True" Visibility="Collapsed" FontSize="20"  Binding="{Binding UniqueID}"/>
                 <DataGridTextColumn Header="背番" IsReadOnly="True"  FontSize="20"  Binding="{Binding 背番}"/>
                 <DataGridTextColumn Header="类型" IsReadOnly="True"  FontSize="20"  Binding="{Binding 类型}"/>
                 <DataGridTextColumn Header="车型" IsReadOnly="True"  FontSize="20"  Binding="{Binding 车型}"/>
-                <DataGridTextColumn Header="生产数"   FontSize="20"  Binding="{Binding 生产数}" />
-                <DataGridTextColumn Header="物流已送"  IsReadOnly="True"  FontSize="20"  Binding="{Binding 物流已送}" >
+                
+                <DataGridTemplateColumn  Header="生产数" Width="*"  >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate> 
+                            <TextBox x:Name="Tb_MSSTART" Text="{Binding 生产数}" GotFocus="Tb_MSSTART_GotFocus"  TextChanged="Tb_MSSTART_TextChanged" InputMethod.IsInputMethodEnabled="False"    FontSize="20"   TextWrapping="Wrap" Grid.Row="10"  PreviewMouseUp="textBox_PreviewMouseUp"  >
+                                <TextBox.Resources>
+                                    <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                                        <VisualBrush.Visual>
+                                            <TextBlock FontStyle="Italic" />
+                                        </VisualBrush.Visual>
+                                    </VisualBrush>
+                                </TextBox.Resources>
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="{x:Null}">
+                                                <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                            </Trigger>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="物流已送"  IsReadOnly="True"  FontSize="20"  Binding="{Binding 物流已送}" />
 
-                </DataGridTextColumn>
 
             </DataGrid.Columns>
         </DataGrid>

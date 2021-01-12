@@ -17,7 +17,7 @@ public class sqlHelp
    
     //获取数据库连接字符串，其属于静态变量且只读，项目中所有文档可以直接使用，但不能修改
     //stdInfoConnectionString为连接字符串的名称 ，在后面添加连接字符串后进行修改
-    public static readonly string ConnectionStringLocalTransaction = "Data Source=10.91.91.245;Initial Catalog=JSSX;Persist Security Info=True;User ID=Staff;Password=66666666";
+    public static readonly string ConnectionStringLocalTransaction = "Data Source=10.91.91.245;Failover Partner = 10.91.91.253;Initial Catalog=JSSX;Persist Security Info=True;User ID=sa;Password=PCqjXEIj2018";
     /// <summary>
     ///执行一个不需要返回值的SqlCommand命令，通过指定专用的连接字符串。
     /// 使用参数数组形式提供参数列表 
@@ -128,6 +128,7 @@ public class sqlHelp
             return val;
         }
     }
+
     /// <summary>
     /// 为执行命令准备参数
     /// </summary>

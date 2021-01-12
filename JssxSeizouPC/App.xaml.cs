@@ -36,7 +36,7 @@ namespace JssxSeizouPC
             SplashScreen s = new SplashScreen("Strat.jpg");
             s.Show(false);
             s.Close(new TimeSpan(0, 0, 5));
-            System.Threading.Thread.Sleep(3000);
+            System.Threading.Thread.Sleep(1000);
             base.OnStartup(e);
         }
     }

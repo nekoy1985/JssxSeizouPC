@@ -28,11 +28,11 @@ namespace JssxSeizouPC
             [DllImport("winspool.drv")]
             public static extern bool SetDefaultPrinter(String Name);
         }
+
         public static string GetData(string UniqueID, string InStockNumber, string WorkShift, string PrintNo, string Label, string SN, string Lines)
         {
             DataTable Dt = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select distinct TrayVolume as 托收容,EuCode as 包装,IsPrinted^1 as 打印,line as 生产线,CONVERT(varchar(10),PlanTime, 23) as 计划日期,a.JSSXInsideCode as 背番,iif(EUCode<>0 and EUCode<>9 and EUCode<>10,KanbanAmount*TrayVolume,KanbanAmount) as 数量,a.JSSXCode as 社番,a.CustomerCode as 客番,c.CustomerInsideCode as 客户背番,InStockNumber as 指示单号,b.CreateTime as 创建时间,Creator as 创建者,[Version] as 版本,KanbanAmount as 需求看板,TrayVolume as 收容数,(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord) as 流水号,c.UniqueID as 主键,iif(IsRepeated=1,1301,iif(IsRepeated=2,0101,d.CategoryNumber)) as 客户编码, (case c.TrayType when '量产' then 'B01L' when '补用品' then 'B01B' when '单纳品' then 'B01D' when '样品' then 'B01Y' when '特殊' then 'B01T' else 'ERROR' end) as 看板类型,CarType as 车型,ProName as 品名,iif(f.Name='广本' or f.Name='东本' ,'本田',f.Name) as 客户名称,Amount% Volume as 端数,EuCode as 箱种,EuName as 容器名称,iif(FreeOfCharge='True',1,0) as 有无偿,a.Note as 备注,g.WHCode as 中间仓编号,g.WHName as 仓库名称,h.WHCode as 中继仓编号,h.WHName as 中继仓名,e.Redistribute as 出货便名,e.CustomerCode as JCC客户代码,iif(LabelType='客户',1,0) as 销售模式 from [dbo].[JSSX_Stock_In_Detailed] as a left join [dbo].[JSSX_Stock_in] as b on a.instocknumber=b.Number  left join JSSX_Products c on a.UniqueID=c.UniqueID left join JSSX_Products_Category_Detailed d on d.UniqueID=a.UniqueID left join JSSX_Products_Category e on d.CategoryNumber=e.Number left join JSSX_Custom f on left(e.Number,2)=f.Number left join JSSX_WareHouse g on e.Warehouse = g.WHCode left join JSSX_WareHouse h on g.IntermediateWarehouse = h.WHCode where  InStockNumber= '" + InStockNumber + "' and a.UniqueID ='" + UniqueID + "'  and d.State is null and c.Revoked=0 and isdelete =0 ").Tables[0];
-            string SalesMode, EuName, RelayStation, WHLocation, Redistribute, Companynumber, WHCodeb, CustomerCode, Warehouse, WHName, EuCode, CustomerInsideCode, JCCCustomerNo, TrayVolume,  JssxCode, JssxInsideCode, Amount, SerialNo, Volume, CustomerNo, UniqueNo, KanbanNo, TrayType, CData, CarType, ProName, Line, PlanTime, CustomerName, Complement, KanbanAoumt, FOC;
-
+            string SalesMode, EuName, RelayStation, WHLocation, Redistribute, Companynumber, WHCodeb, CustomerCode, Warehouse, WHName, EuCode, CustomerInsideCode, JCCCustomerNo, TrayVolume, JssxCode, JssxInsideCode, Amount, SerialNo, Volume, CustomerNo, UniqueNo, KanbanNo, TrayType, CData, CarType, ProName, Line, PlanTime, CustomerName, Complement, KanbanAoumt, FOC;
             TrayVolume = Dt.Rows[0]["托收容"].ToString();
             EuCode = Dt.Rows[0]["包装"].ToString();
             TrayType = Dt.Rows[0]["看板类型"].ToString();
@@ -79,9 +79,9 @@ namespace JssxSeizouPC
             try
             {
                 KanbanNo = "EU";
-                CData = QRData(SalesMode, Companynumber, WHCodeb, "0", "0", Warehouse, EuCode, CustomerCode, CustomerInsideCode, JCCCustomerNo, TrayType, JssxCode, CustomerNo, JssxInsideCode,"1", SerialNo, UniqueNo, InStockNumber, "E", FOC);
+                CData = QRData(SalesMode, Companynumber, WHCodeb, "0", "0", Warehouse, EuCode, CustomerCode, CustomerInsideCode, JCCCustomerNo, TrayType, JssxCode, CustomerNo, JssxInsideCode, "1", SerialNo, UniqueNo, InStockNumber, "E", FOC);
                 createQRCode(InStockNumber + SerialNo, CData);
-                CExcel(WHName, RelayStation, WHLocation, Redistribute, WHCodeb, Warehouse, EuName, TrayType, JssxCode, CustomerCode, JssxInsideCode,"1",SerialNo, UniqueNo, InStockNumber, KanbanNo, CarType, ProName, Line, PlanTime, CustomerName,PrintNo,FOC, Label);
+                CExcel(WHName, RelayStation, WHLocation, Redistribute, WHCodeb, Warehouse, EuName, TrayType, JssxCode, CustomerCode, JssxInsideCode, "1", SerialNo, UniqueNo, InStockNumber, KanbanNo, CarType, ProName, Line, PlanTime, CustomerName, PrintNo, FOC, Label);
                 KanbanPrint_Web(InStockNumber, JssxInsideCode, PrintNo);
                 SheetNo = 0;
                 //sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction,  "update JSSX_Stock_In_Detailed set isprinted=1,EndNo= '" + SerialNo + "' where instocknumber='" + InStockNumber + "' and  UniqueID='" + UniqueNo + "' and  WorkShift='" + WorkShift + "'");
@@ -106,6 +106,7 @@ namespace JssxSeizouPC
                 return false;
             }
         }
+
         public static string DelChinese(string str)
         {
             string retValue = str;
@@ -124,6 +125,7 @@ namespace JssxSeizouPC
             }
             return retValue;
         }
+
         private static void createQRCode(string path, String content)
         {
             EncodingOptions options;
@@ -227,7 +229,7 @@ namespace JssxSeizouPC
             return "F03JSSX" + Companynumber.PadRight(8, ' ') + TrayType.PadRight(6, ' ') + UniqueNo.PadRight(10, ' ') + "0001" + WorkShift + FOC + WHCodeb.PadRight(5, ' ') + space.PadRight(16, ' ') + space.PadRight(11, ' ') + Numerator.PadLeft(4, '0') + Denominator.PadLeft(4, '0') + SerialNo.PadLeft(8, '0') + JssxInsideCode.PadRight(4, ' ') + JssxCode.PadRight(20, ' ') + Volume.PadLeft(4, '0') + Warehouse.PadRight(5, ' ') + CustomerNo.PadLeft(10, ' ') + EuCode.PadLeft(2, '0') + space.PadRight(11, ' ') + CustomerCode.PadRight(20, ' ') + CustomerInsideCode.PadRight(4, ' ') + JCCCustomerNo.PadRight(8, ' ') + sType + SalesMode + space.PadRight(55, ' ') + InStockNumber.PadRight(20, ' ');
         }
 
-        public static void CExcel(string WHName, string RelayStation, string WHLocation, string Redistribute, string WHCodeb, string Warehouse, string EuName, string TrayType, string JssxCode, String CustomerCode, String JssxInsideCode, String Volume, String SerialNo, String UniqueNo, String InStockNumber, String KanbanNo, String CarType, String ProName, string Line, string PlanTime, string CustomerName, string PrintNo,string FOC, string label )
+        public static void CExcel(string WHName, string RelayStation, string WHLocation, string Redistribute, string WHCodeb, string Warehouse, string EuName, string TrayType, string JssxCode, String CustomerCode, String JssxInsideCode, String Volume, String SerialNo, String UniqueNo, String InStockNumber, String KanbanNo, String CarType, String ProName, string Line, string PlanTime, string CustomerName, string PrintNo, string FOC, string label)
         {
             int pictureIdx = 0;
             int pictureIdx2 = 0;
@@ -352,7 +354,7 @@ namespace JssxSeizouPC
 
             ICellStyle style6 = workbook.CreateCellStyle();
             style6.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
-            style6.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center; 
+            style6.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
             style6.BorderTop = BorderStyle.Thin;
             style6.WrapText = true;
             style6.ShrinkToFit = true;
@@ -483,9 +485,6 @@ namespace JssxSeizouPC
             Externs.SetDefaultPrinter(strDefaultPrinter);
 
         }
-
-
-
 
     }
 }

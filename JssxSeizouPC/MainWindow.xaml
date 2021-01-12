@@ -8,52 +8,73 @@
         mc:Ignorable="d"
         Title="制造部·生产照合系统" ContentRendered="Window_ContentRendered" Icon="JssxSeizouPC.ico"   Height="746" Width="1024" ResizeMode="NoResize" Closing="Window_Closing" WindowState="Maximized" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown" WindowStyle="None" >
     <Window.Resources>
-        <Style x:Key="OuterGlowStyle" TargetType="{x:Type FrameworkElement}">
+
+        <!--调整按钮控件-->
+        <Style x:Key="OuterGlowStyle" TargetType="Button">
+            <Setter Property="Background"  Value="Black"/>
+            <Setter Property="BorderBrush"  Value="Aqua"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect x:Name="OG" BlurRadius="0" Color="Aqua" Direction="0" Opacity="0.6" RenderingBias="Performance" ShadowDepth="0">
-                        <Storyboard.TargetProperty>
-                            BlurRadius
-                        </Storyboard.TargetProperty>
-                    </DropShadowEffect>
+                    <DropShadowEffect BlurRadius="20" Color="Aqua" Direction="0" Opacity="0.6" RenderingBias="Performance" ShadowDepth="0"/>
                 </Setter.Value>
             </Setter>
+        </Style>
+        <!--调整日期控件-->
+        <Style x:Key="styleCalendar" TargetType="Calendar" >
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="Width" Value="Auto" />
+            <Setter Property="LayoutTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="2" ScaleY="2"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="20" Color="Aqua" Direction="0" Opacity="0.6" RenderingBias="Performance" ShadowDepth="0"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--调整combobox控件-->
+        <Style x:Name="cbItem" TargetType="ComboBoxItem">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground"  Value="#70f3ff"/>
+            <Setter Property="BorderBrush"  Value="Aqua"/>
             <Style.Triggers>
-                <EventTrigger RoutedEvent="GotFocus">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Storyboard.TargetProperty="(FrameworkElement.Effect).(DropShadowEffect.BlurRadius)" BeginTime="00:00:00" From="0" To="10" Duration="00:00:01" AutoReverse="True" RepeatBehavior="Forever"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontSize" Value="30"/>
+                    <Setter Property="Height" Value="50"/>
+                    <Setter Property="Foreground"  Value="Aqua"/>
+                </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
-
     <Grid >
-
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="13*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="10*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="12*"/>
-            <RowDefinition Height="12*"/>
-            <RowDefinition Height="4*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="1*"/>
             <RowDefinition/>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="40*"/>
-
-            <RowDefinition Height="72*"/>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="17*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="20*"/>
+            <RowDefinition Height="20*"/>
+            <RowDefinition Height="20*"/>
+            <RowDefinition Height="50*"/>
+            <RowDefinition Height="20*"/>
+            <RowDefinition Height="10*"/>
 
         </Grid.RowDefinitions>
         <Popup Name="popNumKeyboard" StaysOpen="False" DockPanel.Dock="Bottom" PopupAnimation="Scroll"  AllowsTransparency="True">
@@ -61,25 +82,25 @@
                 <local:NumericKeyboard x:Name="grqNumKB" />
             </Border>
         </Popup>
-        <Border Background="Gray" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" Grid.RowSpan="2"></Border>
+        <Border Background="#ff444444" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" Grid.RowSpan="2"></Border>
         <Border Background="Red" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" ></Border>
 
-        <DataGrid MouseDoubleClick="Dg_Show_PreviewMouseDoubleClick"   x:Name="Dg_Show" Grid.RowSpan="5" Foreground="Black" Background="#001f55" Grid.Row="5" Grid.Column="0" Margin="1,1,1,1" Grid.ColumnSpan="4" FontSize="25" IsTabStop="false" IsReadOnly="True" >
+        <DataGrid MouseDoubleClick="Dg_Show_PreviewMouseDoubleClick" x:Name="Dg_Show" Grid.RowSpan="9" BorderThickness="1" BorderBrush="Aqua"  Background="#000000" Grid.Row="5" Grid.Column="0"  Margin="3,1,0,0" Grid.ColumnSpan="4" FontSize="25" IsTabStop="false" IsReadOnly="True" >
             <DataGrid.Style>
                 <Style TargetType="DataGrid">
                     <!--网格线颜色-->
                     <Setter Property="CanUserResizeColumns" Value="false"/>
-                    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"></Setter>
-                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"></Setter>
                     <Setter Property="HeadersVisibility" Value="Column"/>
+                    <Setter Property="HorizontalScrollBarVisibility" Value="Hidden"/>
+                    <Setter Property="VerticalScrollBarVisibility" Value="Hidden"/>
                     <Setter Property="HorizontalGridLinesBrush">
                         <Setter.Value>
-                            <SolidColorBrush Color="#03ffea"/>
+                            <SolidColorBrush Color="Aqua"/>
                         </Setter.Value>
                     </Setter>
                     <Setter Property="VerticalGridLinesBrush">
                         <Setter.Value>
-                            <SolidColorBrush Color="#03ffea"/>
+                            <SolidColorBrush Color="Aqua"/>
                         </Setter.Value>
                     </Setter>
                 </Style>
@@ -87,44 +108,53 @@
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
-                    <Setter Property="Background" Value="#001f55"></Setter>
-                    <Setter Property="Foreground" Value="#17acae"></Setter>
-                    <Setter Property="BorderThickness" Value="1"></Setter>
-                    <Setter Property="BorderBrush" Value="#03ffea"></Setter>
+                    <Setter Property="Background" Value="#000000"></Setter>
+                    <Setter Property="Foreground" Value="Aqua"></Setter>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"></Setter>
+                    <Setter Property="BorderBrush" Value="Aqua"></Setter>
                 </Style>
             </DataGrid.ColumnHeaderStyle>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="BorderThickness" Value="2"></Setter>
+                    <Setter Property="Foreground" Value="Aqua" />
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
-                    <Setter Property="Background" Value="#001f55" />
-                    <Setter Property="Height" Value="35"/>
-                    <Setter Property="Foreground" Value="#03ffea" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                    <Setter Property="Background" Value="#000000" />
+                    <Setter Property="Height" Value="45"/>
+                    <Setter Property="BorderThickness" Value="0"></Setter>
+                    <Setter Property="Foreground" Value="Aqua" />
                 </Style>
             </DataGrid.RowStyle>
+
         </DataGrid>
 
-        <TextBox x:Name="Tb_PlanNo" IsReadOnly="True" InputMethod.IsInputMethodEnabled="False"  Grid.Row="0" Grid.Column="0"  TextWrapping="Wrap"  Margin="20,3,20,3"  Grid.ColumnSpan="3" Foreground="Black" VerticalContentAlignment="Center" Background="aqua"  FontSize="30" IsTabStop="False" TextAlignment="Center" Grid.RowSpan="2"/>
-        <TextBox x:Name="Tb_BigKanbanNo" Canvas.Top ="80"   IsReadOnly="True" InputMethod.IsInputMethodEnabled="False"  BorderThickness="0,0,0,0" Grid.Row="10" Grid.Column="0"  TextWrapping="Wrap"  Foreground="Aqua" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  Grid.ColumnSpan="4"  FontSize="20" IsTabStop="False" Margin="3,3,3,3"  />
-        <!--<TextBox x:Name="Tb_LabelNo" InputMethod.IsInputMethodEnabled="False"  BorderThickness="0,0,0,0" Grid.Row="6" Grid.Column="1"  TextWrapping="Wrap"    Grid.ColumnSpan="3" Background="Green" FontSize="26.667" IsTabStop="False" Margin="3,3,3,3"  />-->
-        <TextBox x:Name="Tb_Completed"  Style="{StaticResource OuterGlowStyle}" InputMethod.IsInputMethodEnabled="False" Background="White"   Foreground="Red" BorderThickness="0,0,0,0" Grid.Row="4" Grid.Column="3" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TextWrapping="Wrap"   FontSize="50" IsTabStop="False" Margin="3,3,4,3"  />
-        <Button x:Name="Btn_Submit" VerticalContentAlignment="Center" Visibility="Hidden" Content="提交加班" IsEnabled="False" Grid.Column="6" FontSize="30"    Grid.Row="10" Click="Btn_Submit_Click"/>
-        <Button x:Name="Btn_Unlock" Foreground="#FF17ACAE" VerticalContentAlignment="Center" Content="打开权限" Grid.Column="4" FontSize="30" Grid.Row="4" Margin="3,3,3,3"   Click="Btn_Unlock_Click" />
-        <TextBox x:Name="Tb_Gun1" Grid.Column="3" Margin="3,3,3,3" FontSize="40" IsReadOnly="True" TextWrapping="Wrap" Text="枪A" TextAlignment="Center"  Foreground="#FF17ACAE" Grid.Row="0" Grid.RowSpan="2"  />
+        <Label x:Name="Tb_PlanNo" InputMethod.IsInputMethodEnabled="False"  Grid.Row="0" Grid.Column="0" Margin="5,0,0,0"  Foreground="Aqua" FontSize="25" IsTabStop="False"  Grid.RowSpan="2"/>
+        <Label x:Name="Tb_BigKanbanNo" Canvas.Top ="80" InputMethod.IsInputMethodEnabled="False"   Grid.Row="0" Grid.Column="1"  Foreground="Aqua"   Grid.ColumnSpan="2" Grid.RowSpan="2" FontSize="25" IsTabStop="False"  />
+        <!--<TextBox x:Name="Tb_LabelNo" InputMethod.IsInputMethodEnabled="False"  BorderThickness="0,0,0,0" Grid.Row="6" Grid.Column="1"  TextWrapping="Wrap"    Grid.ColumnSpan="3" Background="Green" FontSize="26.667" IsTabStop="False"  Margin="10"  />-->
+        <TextBox x:Name="Tb_Completed"  InputMethod.IsInputMethodEnabled="False" Background="Black" BorderBrush="Aqua"  Foreground="Red" BorderThickness="1" Grid.Row="4" Grid.Column="3" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" TextWrapping="Wrap"   FontSize="25" IsTabStop="False" Margin="2,0,0,0"   />
 
-        <TextBox x:Name="Tb_Gun2" Grid.Column="4" Margin="3,3,3,3" FontSize="40" IsReadOnly="True" TextWrapping="Wrap" Text="枪B" Grid.Row="0" Foreground="#FF17ACAE" TextAlignment="Center" Grid.RowSpan="2"   />
+        <TextBox x:Name="Tb_Gun1" Grid.Column="3"  Margin="2" FontSize="25" IsReadOnly="True" TextWrapping="Wrap" Background="Black" BorderBrush="Aqua" Text="枪A" TextAlignment="Center" VerticalContentAlignment="Center"  Foreground="Red" Grid.Row="0" Grid.RowSpan="2"  />
+        <TextBox x:Name="Tb_Gun2" Grid.Column="4"  Margin="2" FontSize="25" IsReadOnly="True" TextWrapping="Wrap" Background="Black" BorderBrush="Aqua" Text="枪B" Grid.Row="0" Foreground="Red" TextAlignment="Center" VerticalContentAlignment="Center" Grid.RowSpan="2"   />
+        <TextBox x:Name="Tb_Gun3" Grid.Column="5"  Margin="2" FontSize="25" IsReadOnly="True" TextWrapping="Wrap" Background="Black" BorderBrush="Aqua" Text="继电器" TextAlignment="Center" VerticalContentAlignment="Center" Foreground="Red" Grid.Row="0" Grid.RowSpan="2"  />
 
-        <TextBox x:Name="Tb_Gun3" Grid.Column="5" Margin="3,3,3,3" FontSize="40" IsReadOnly="True" TextWrapping="Wrap" Text="继电器" TextAlignment="Center" Foreground="#FF17ACAE" Grid.Row="0" Grid.RowSpan="2"  />
-        <Label x:Name="Tb_Version" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.Column="5" Grid.Row="10" FontSize="30" Foreground="Red" Margin="1,1,1,1" />
-        <Label x:Name="Tb_Timer" Grid.Column="6"  Grid.Row="0" FontSize="40" HorizontalContentAlignment="Right"  Foreground="Red" Margin="3,3,3,1" Grid.RowSpan="2" />
+        <Label x:Name="Tb_Version" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.Column="5" Grid.Row="11" FontSize="20" Foreground="Red" Margin="1,1,1,1" />
+        <Label x:Name="Tb_Timer" Grid.Column="6"  Grid.Row="0" FontSize="25" HorizontalContentAlignment="Right"  Foreground="Red"  Grid.RowSpan="2" />
 
-        <Border  BorderThickness="1"   Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="7"  Grid.RowSpan="6" Margin="10,10,10,10">
-            <WrapPanel x:Name="WP_Message" Margin="0,208,0,120"/>
+        <Border  BorderThickness="1"   Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="7"  Grid.RowSpan="3" Margin="3,10,0,0">
+            <WrapPanel x:Name="WP_Message" Margin="-1,-1,-1,9"/>
         </Border>
-        <Button x:Name="Btn_OutStock"  Content="退库" Grid.Column="4" FontSize="30" Grid.Row="6" Margin="3,3,3,3"   Foreground="#FF17ACAE" Click="Btn_OutStock_Click"/>
-        <Button x:Name="Btn_Schedule"  Content="加工计划" Grid.Column="6" FontSize="30" Grid.Row="7" Margin="3,3,3,3"   Foreground="#FF17ACAE" Click="Btn_Schedule_Click"/>
 
-        <Button x:Name="Btn_Rebuild"  Content="EU重制" Grid.Column="4"  FontSize="30" Grid.Row="7" Margin="3,3,3,3"  Foreground="#FF17ACAE" Click="Btn_Rebuild_Click" />
-        <!--<TextBox x:Name="Tb_Speed" Grid.Column="6" Margin="3,3,3,3" FontSize="40" IsReadOnly="True" TextWrapping="Wrap" Text="" Grid.Row="0" TextAlignment="Center"  Grid.RowSpan="2" />-->
-        <ComboBox x:Name="Cbx_OverTimes" Visibility="Hidden" Grid.Column="5" Grid.Row="10" Margin="3,10,3,10"  IsEnabled="False" FontSize="30" >
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_Unlock" Content="打开权限" FontWeight="Bold" Foreground="Aqua" VerticalContentAlignment="Center" Grid.RowSpan="2" Grid.Column="4" FontSize="20" Grid.Row="4"  Margin="10"   Click="Btn_Unlock_Click" />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_OpenCom" Content="枪异常修复" FontSize="20"   Grid.Column="5"  Grid.RowSpan="2"  Margin="10" Grid.Row="4" Foreground="#FF00FF00" Click="Btn_OpenCom_Click" />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_Schedule"  Content="加工计划" Grid.Column="6" FontSize="20" Grid.RowSpan="2"  Grid.Row="4"  Margin="10"   Foreground="Aqua" Click="Btn_Schedule_Click"/>
+
+        <!--<TextBox x:Name="Tb_Speed" Grid.Column="6"  Margin="10" FontSize="40" IsReadOnly="True" TextWrapping="Wrap" Text="" Grid.Row="0" TextAlignment="Center"  Grid.RowSpan="2" />-->
+        <ComboBox x:Name="Cbx_OverTimes" Visibility="Hidden" Grid.Column="5" Grid.Row="10" Margin="3,10,3,10"  IsEnabled="False" FontSize="20" >
             <ComboBoxItem IsSelected="True">选择加班</ComboBoxItem>
             <ComboBoxItem >0.5</ComboBoxItem>
             <ComboBoxItem >1</ComboBoxItem>
@@ -132,19 +162,23 @@
             <ComboBoxItem >2</ComboBoxItem>
             <ComboBoxItem>2.5</ComboBoxItem>
         </ComboBox>
-        <Button x:Name="Btn_Refresh" Content="刷新计划" FontSize="30"  Grid.Column="4"   Margin="3,3,3,3" Grid.Row="5" Foreground="#FF17ACAE" Click="Btn_Refresh_Click"  />
-        <!--<Button x:Name="button" Content="Button" Grid.Column="5" HorizontalAlignment="Left" Margin="5,5,0,0" Grid.Row="3" VerticalAlignment="Top" Width="27" Click="button_Click" RenderTransformOrigin="-3.021,12.394" Grid.RowSpan="2" Height="19"/>
-        <Button x:Name="button_Copy" Content="Button" Grid.Column="5" HorizontalAlignment="Left" Margin="4,4,0,0" Grid.Row="6" VerticalAlignment="Top" Width="27" Click="button_Copy_Click" RenderTransformOrigin="-3.021,12.394" Height="19"/>-->
-        <local:LoadingWait x:Name="_loading" Grid.Column="3" Grid.Row="6"  Margin="3,3,3,3"  Visibility="Visible"/>
-        <ComboBox x:Name="Cbx_ProductSelection" HorizontalContentAlignment="Center" Grid.ColumnSpan="3" FontSize="40" Margin="3,3,3,3" Grid.Row="4" Foreground="Red" />
+        <local:LoadingWait x:Name="_loading" Grid.Column="2" Grid.RowSpan="2"  Grid.Row="7" Visibility="Visible"/>
+        <ComboBox x:Name="Cbx_ProductSelection" HorizontalContentAlignment="Center"  Grid.ColumnSpan="3" FontSize="25" Margin="5,3,3,3" Grid.Row="4" Foreground="Aqua" />
 
-        <Button x:Name="Btn_DamageFeedback" Content="损坏反馈" FontSize="30"  Grid.Column="6"   Margin="3,3,3,3" Grid.Row="5" Foreground="#FF17ACAE" Click="Btn_DamageFeedback_Click"/>
-        <Button x:Name="Btn_Ending" Content="当值完了" FontSize="30"  Grid.Column="6"   Margin="3,3,3,3" Grid.Row="4" Foreground="#FF17ACAE" Click="Btn_Ending_Click" />
-        <Button x:Name="Btn_Report" Content="生产报表" FontSize="30"  Grid.Column="5"   Margin="3,3,3,3" Grid.Row="5" Foreground="#FF17ACAE" Click="Btn_Report_Click" />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_Refresh" Content="刷新计划" FontSize="20"  Grid.Column="4"   Margin="10" Grid.Row="6" Foreground="Aqua" Click="Btn_Refresh_Click"  />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_DamageFeedback" Content="损坏反馈" FontSize="20"  Grid.Column="5"    Margin="10" Grid.Row="6" Foreground="Aqua" Click="Btn_DamageFeedback_Click"/>
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_Ending" Content="当值完了" Visibility="Hidden"  FontSize="20"  Grid.Column="6"  Margin="10" Grid.Row="6" Foreground="Aqua" Click="Btn_Ending_Click" />
 
-        <Rectangle x:Name="Rec_Shape" Opacity="0.7" Grid.Column="3"   Grid.Row="4" Margin="3,3,3,3" />
-        <Button x:Name="Btn_OpenCom" Content="枪异常修复" FontSize="30"  Grid.Column="5"   Margin="3,3,3,3" Grid.Row="4" Foreground="#FF00FF00" Click="Btn_OpenCom_Click" />
-        <TextBox x:Name="Tb_MSSTART"  TextChanged="Tb_MSSTART_TextChanged" GotFocus="Tb_MSSTART_GotFocus"  LostFocus="Tb_MSEND_LostFocus"   InputMethod.IsInputMethodEnabled="False" Grid.Column="4" Margin="3,3,3,3" FontSize="40"   TextWrapping="Wrap" Grid.Row="9" Foreground="#FF17ACAE" TextAlignment="Center" PreviewMouseUp="textBox_PreviewMouseUp"  >
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_Rebuild"  Content="EU重制" Visibility="Hidden" Grid.Column="4"  FontSize="20" Grid.Row="7"  Margin="10"  Foreground="Aqua" Click="Btn_Rebuild_Click" />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_OutStock"  Content="退库" Visibility="Hidden" Grid.Column="5" FontSize="20" Grid.Row="7"  Margin="10"   Foreground="Aqua" Click="Btn_OutStock_Click"/>
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_OutStockAll" Content="全部退库" Visibility="Hidden" FontSize="20"  Grid.Column="6"    Margin="10" Grid.Row="7" Foreground="Aqua" Click="Btn_OutStockAll_Click" />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_ChangeKanban" Content="切换看板" Visibility="Hidden" FontSize="20"  Grid.Column="4"    Margin="10" Grid.Row="8" Foreground="Aqua" Click="Btn_ChangeKanban_Click"  />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_SetOK" Content="OK" Visibility="Hidden"  FontSize="100"  Grid.Column="4"  Grid.ColumnSpan="3"  Margin="10" Grid.Row="9" Foreground="Green" Click="Btn_SetOK_Click" />
+
+
+
+        <Rectangle x:Name="Rec_Shape" Opacity="0.7" Grid.Column="3"   Grid.Row="4"  Margin="3" />
+        <TextBox x:Name="Tb_MSSTART"  TextChanged="Tb_MSSTART_TextChanged" GotFocus="Tb_MSSTART_GotFocus" BorderBrush="Aqua"  LostFocus="Tb_MSEND_LostFocus"  Background="Black" InputMethod.IsInputMethodEnabled="False" Grid.Column="4"  Margin="10" FontSize="40"   TextWrapping="Wrap" Grid.Row="10" Foreground="Aqua" VerticalContentAlignment="Center"  TextAlignment="Center" PreviewMouseUp="textBox_PreviewMouseUp"  >
             <TextBox.Resources>
                 <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
                     <VisualBrush.Visual>
@@ -165,7 +199,7 @@
                 </Style>
             </TextBox.Style>
         </TextBox>
-        <TextBox x:Name="Tb_MSEND" GotFocus="Tb_MSEND_GotFocus" LostFocus="Tb_MSEND_LostFocus" InputMethod.IsInputMethodEnabled="False" Grid.Column="5" Margin="3,3,3,3" FontSize="40"   TextWrapping="Wrap"  Grid.Row="9" Foreground="#FF17ACAE" TextAlignment="Center" Visibility="Hidden" PreviewMouseUp="textBox_PreviewMouseUp" >
+        <TextBox x:Name="Tb_MSEND" GotFocus="Tb_MSEND_GotFocus" LostFocus="Tb_MSEND_LostFocus" InputMethod.IsInputMethodEnabled="False" Grid.Column="5"  Margin="10" FontSize="40"   TextWrapping="Wrap"  Grid.Row="10" Foreground="Aqua" TextAlignment="Center" Visibility="Hidden" PreviewMouseUp="textBox_PreviewMouseUp" >
             <TextBox.Resources>
                 <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
                     <VisualBrush.Visual>
@@ -186,10 +220,12 @@
                 </Style>
             </TextBox.Style>
         </TextBox>
-        <Button x:Name="Btn_MSSubmit" Content="+" FontSize="80"  Grid.Column="5" Margin="3,3,3,3" Grid.Row="9" Foreground="Green" Click="Btn_MSSubmit_Click"/>
-        <Button x:Name="Btn_MSSubmit2" Content="-" FontSize="80"  Grid.Column="6" Margin="3,3,3,3" Grid.Row="9" Foreground="Red" Click="Btn_MSSubmit2_Click"/>
-        <DatePicker  x:Name="DP_Datatime" FontSize="25"  Grid.Column="4"   Margin="3,3,3,3" Grid.Row="10" IsDropDownOpen="False" SelectedDateFormat="Short"/>
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_MSSubmit" Content="+" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Grid.Column="5"  Margin="10" Grid.Row="10" Foreground="Green" Click="Btn_MSSubmit_Click"/>
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_MSSubmit2" Content="-" FontSize="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" Grid.Column="6"  Margin="10" Grid.Row="10" Foreground="Red" Click="Btn_MSSubmit2_Click"/>
 
+        <DatePicker CalendarStyle="{StaticResource styleCalendar}" Background="Black" BorderBrush="Aqua"  x:Name="DP_Datatime" FontSize="25" Foreground="Aqua" Grid.Column="4" Margin="1" Grid.Row="11" IsDropDownOpen="False" SelectedDateFormat="Short"/>
+        <StackPanel />
+        <Image x:Name="Im_Notic" Grid.ColumnSpan="6" Grid.Column="4"  Margin="5,5,5,5" Grid.Row="6" Grid.RowSpan="4" Source="Notice.jpg" Visibility="Hidden" Stretch="Fill"/>
     </Grid>
 
 </Window>

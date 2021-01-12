@@ -6,12 +6,46 @@
         xmlns:local="clr-namespace:JssxSeizouPC"
         Background="Black"
         mc:Ignorable="d"
-        Title="登陆" Height="300" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen"  Topmost="True" Icon="JssxSeizouPC.ico" ResizeMode="NoResize" >
+        Title="登陆" Height="500" Width="500"  WindowStartupLocation="CenterScreen" WindowStyle="None" Topmost="True" Icon="JssxSeizouPC.ico" ResizeMode="NoResize" >
+    <Window.Resources>
+        <Style x:Key="OuterGlowStyle" TargetType="Button">
+            <Setter Property="Background"  Value="Black"/>
+            <Setter Property="BorderBrush"  Value="Aqua"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="20" Color="Aqua" Direction="0" Opacity="0.6" RenderingBias="Performance" ShadowDepth="0"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="131*"/>
+            <RowDefinition Height="2.5*"/>
+            <RowDefinition Height="2.5*"/>
+            <RowDefinition Height="2.5*"/>
+            <RowDefinition Height="2.5*"/>
         </Grid.RowDefinitions>
-        <ComboBox x:Name="Cbx_Line" Margin="50,100,50,100" FontSize="50" SelectionChanged="Cbx_Line_SelectionChanged"  Grid.Row="0" Grid.Column="0" />
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition Width="2.5*"/>
+            <ColumnDefinition Width="2.5*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="Btn_Line1" Style="{StaticResource OuterGlowStyle}"  Content="一线"  Foreground="Aqua" ToolTip="1" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="0" Grid.Column="0" Click="Btn_Line_Click"  />
+        <Button x:Name="Btn_Line2" Style="{StaticResource OuterGlowStyle}"  Content="二线"  Foreground="Aqua" ToolTip="2" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="0" Grid.Column="1" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line3" Style="{StaticResource OuterGlowStyle}"  Content="三线"  Foreground="Aqua" ToolTip="3" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="0" Grid.Column="2" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line4" Style="{StaticResource OuterGlowStyle}"  Content="四线"  Foreground="Aqua" ToolTip="4" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="0" Grid.Column="3" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line5" Style="{StaticResource OuterGlowStyle}"  Content="DP1线"  Foreground="Aqua" ToolTip="5" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="1" Grid.Column="0" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line6" Style="{StaticResource OuterGlowStyle}"  Content="MS线"  Foreground="Aqua" ToolTip="6" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="1" Grid.Column="1" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line7" Style="{StaticResource OuterGlowStyle}"  Content="KD线"  Foreground="Aqua" ToolTip="7" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="1" Grid.Column="2" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line8" Style="{StaticResource OuterGlowStyle}"  Content="DP2线"  Foreground="Aqua" ToolTip="8" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="1" Grid.Column="3" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line9" Style="{StaticResource OuterGlowStyle}"  Content="五线"  Foreground="Aqua" ToolTip="9" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="2" Grid.Column="0" Click="Btn_Line_Click" />
+        <Button x:Name="Btn_Line10" Style="{StaticResource OuterGlowStyle}"  Content="RP线"  Foreground="Aqua" ToolTip="10" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="2" Grid.Column="1" Click="Btn_Line_Click" />
+
+        <Button x:Name="Btn_Close" Style="{StaticResource OuterGlowStyle}"  Content="退出"  Foreground="red" ToolTip="9" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="3" Grid.Column="3" Click="Btn_Close_Click" />
+     
+
     </Grid>
 </Window>
