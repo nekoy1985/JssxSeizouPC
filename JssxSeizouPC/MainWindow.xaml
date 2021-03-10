@@ -173,7 +173,7 @@
         <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_OutStock"  Content="退库" Visibility="Hidden" Grid.Column="5" FontSize="20" Grid.Row="7"  Margin="10"   Foreground="Aqua" Click="Btn_OutStock_Click"/>
         <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_OutStockAll" Content="全部退库" Visibility="Hidden" FontSize="20"  Grid.Column="6"    Margin="10" Grid.Row="7" Foreground="Aqua" Click="Btn_OutStockAll_Click" />
         <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_ChangeKanban" Content="切换看板" Visibility="Hidden" FontSize="20"  Grid.Column="4"    Margin="10" Grid.Row="8" Foreground="Aqua" Click="Btn_ChangeKanban_Click"  />
-        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_Shutdown" Content="下机"   FontSize="20"  Grid.Column="7"    Margin="10" Grid.Row="8" Foreground="Red" Click="Btn_ChangeKanban_Click"  />
+        <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_Shutdown" Content="下机"   FontSize="100"  Grid.Column="4"  Grid.ColumnSpan="3"  Margin="10" Grid.Row="9"  Foreground="Red" Click="Btn_Shutdown_Click"  />
         <Button Style="{StaticResource OuterGlowStyle}"  x:Name="Btn_SetOK" Content="OK" Visibility="Hidden"  FontSize="100"  Grid.Column="4"  Grid.ColumnSpan="3"  Margin="10" Grid.Row="9" Foreground="Green" Click="Btn_SetOK_Click" />
 
 

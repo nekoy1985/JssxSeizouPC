@@ -105,8 +105,51 @@ namespace JssxSeizouPC
             FullCom = System.Configuration.ConfigurationManager.AppSettings["Devices"];
             GetOldData(Lines);
             Tb_Version.Content = " Ver " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            Btn_OpenCom_Click(null, null); 
+            Btn_OpenCom_Click(null, null);
+
+            #region  上下机操作
+            string LN = System.Configuration.ConfigurationManager.AppSettings["LinesName"];
+            string sql_Working = "select * from JSSX_Line_Working_Status where cEndTime is  null and cLineCode = '" + LN + "'";
+            DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Working);
+            if (ds_Working.Tables[0].Rows.Count == 0)
+            {
+                //下机状态，显示上机文字
+                Btn_Shutdown.Content = "上机";
+            }
+            else
+            {
+                //上机状态，显示下机文字
+                Btn_Shutdown.Content = "下机";
+
+            }
+            #endregion  
+
         }
+
+        private void Btn_Shutdown_Click(object sender, RoutedEventArgs e)
+        {
+            #region  上下机操作
+
+            string LN = System.Configuration.ConfigurationManager.AppSettings["LinesName"];
+            if (Btn_Shutdown.Content.ToString() == "上机")
+            {
+
+
+                string sql_Working = "insert into JSSX_Line_Working_Status(iStatusCode, cLineCode, cStartTime,cDate,cWorkShift) values(1, '" + LN + "', GETDATE(),iif(right(CONVERT(varchar(20),getdate(),120),8) <'07:00:00', CONVERT(varchar(10),DATEADD(day,-1,getdate()),120),CONVERT(varchar(10),getdate(),120)),iif(right( CONVERT(varchar(20), getdate(),120),8) between '07:30:00' and '19:30:00' ,'D','N'))";
+                DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Working);
+                Btn_Shutdown.Content = "下机";
+            }
+            else
+            {
+                string sql_Working = "update JSSX_Line_Working_Status set iStatusCode = 2, cEndTime = GETDATE() where cLineCode = '" + LN + "' and iStatusCode = 1";
+                DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Working);
+                Btn_Shutdown.Content = "上机";
+            }
+
+            #endregion
+
+        }
+
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -900,6 +943,7 @@ namespace JssxSeizouPC
             }
         }
 
+
         public void DataAnalysis(string Res)
         {
             if (Res.Length <= 5)
@@ -975,7 +1019,7 @@ namespace JssxSeizouPC
                     {
                         Tb_PlanNo.Content = Res;
                         DS_Show = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select a.* from master..spt_values  b left join (select top 30 ROW_NUMBER() over(order by InStocknumber) as ID,a.JssxInsideCode as 背番,TrayType+'__'+CarType+'__'+WorkShift as 车型, Amount as 总量,QuantityCompletion as 完成,a.JssxCode as 社番,b.CarLabel as 铭板信息,a.CustomerCode as 客番,WorkShift as 班次,b.UniqueID as UID  from JSSX_Stock_In_Detailed as a left join [dbo].[JSSX_Products] as b on a.UniqueID=b.UniqueID and b.Revoked=0  where InStocknumber='" + Res + "' and isfinish=0 order by 班次 asc)  a  on a.ID = b.number where b.type='p' and number between 1 and 30 order by number");
-                        DS_30Days = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select distinct ScanResult,c.Status,KanbanNo,a.UniqueID,c.InStockNumber from [dbo].[JSSX_Stock_In_Detailed] a left join [dbo].[JSSX_Stock_In] b on a.InStockNumber = b.Number left join JSSX_ScanRecord_Seizou c on a.UniqueID = c.UniqueID  and c.ScanResult != 'EM' where a.instocknumber= '" + Res + "' and b.Isfinish is not null and c.ScanTime > dateadd(DAY, -9, getdate())");
+                        DS_30Days = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select distinct ScanResult,c.Status,KanbanNo,a.UniqueID,c.InStockNumber from [dbo].[JSSX_Stock_In_Detailed] a left join [dbo].[JSSX_Stock_In] b on a.InStockNumber = b.Number left join JSSX_ScanRecord_Seizou c on a.UniqueID = c.UniqueID  and c.ScanResult != 'EM' where a.instocknumber= '" + Res + "' and b.Isfinish is not null and c.ScanTime > dateadd(DAY, -15, getdate())");
                         if (DS_Show.Tables[0].Rows.Count == 0)
                         {
                             Tb_PlanNo.Content = "";
@@ -1190,7 +1234,7 @@ namespace JssxSeizouPC
             int iQuantityCompletion = 0;//此看板的数据
             int iQuantityCompletion2 = 0;//整个计划的数据
 
-            if (Customer_Codecontain && Res.Length > 4)
+            if (Customer_Codecontain&& CarLabel.Length >= 3 && Res.Length > 4)
             {
                 try
                 {
@@ -1237,7 +1281,7 @@ namespace JssxSeizouPC
                         {
                             //新年来之后做一个1分钟刷新一次明细表的功能
                             //INKANBAN表可以把已经完结的都清掉
-                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_Stock_In_SerialNoRecord (InStockNumber,UniqueID,SerialNo,Complement,Creator,DayNight) values('EU','" + UniqueID + "',(select right((select 100000000+(select max(SerialNo)+1 as 流水号 from JSSX_Stock_In_SerialNoRecord)),8)),'0','" + Lines + "','F'); insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "',(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord),'" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(HOUR,-8, GETDATE()),120))");
+                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_Stock_In_SerialNoRecord (InStockNumber,UniqueID,SerialNo,Complement,Creator,DayNight) values('EU','" + UniqueID + "',(select right((select 100000000+(select max(SerialNo)+1 as 流水号 from JSSX_Stock_In_SerialNoRecord)),8)),'0','" + Lines + "','F'); insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "','" + UniqueID  + "'+(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord),'" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(HOUR,-8, GETDATE()),120))");
                             if (!bTran)
                             {
                                 Speaker("铭板照合失败。", 3);
@@ -1490,7 +1534,6 @@ namespace JssxSeizouPC
             Series = "";
             GC.Collect();
         }
-
       
         private void ButtonLocker()
         {
