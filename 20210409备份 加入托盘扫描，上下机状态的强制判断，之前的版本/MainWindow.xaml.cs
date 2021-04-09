@@ -27,7 +27,7 @@ namespace JssxSeizouPC
         private static int iWorkType = 0;//工作模式
 
         private static int iRow = 0, iProductSelection = -1;
-        private DispatcherTimer timer, timer2, OpenComTimer, SpeedTest, tButtonLocker, Schedule, DTStatus;
+        private DispatcherTimer timer, timer2, OpenComTimer, SpeedTest, tButtonLocker, Schedule,DTStatus;
         private string sCom1 = "";
         private static string Resplus = "";
         private static string sTemp = "";
@@ -43,8 +43,8 @@ namespace JssxSeizouPC
         private static string CarLabel = "";
         private static int Amount = 0, COM = 1, OpenedCom = 0, iAmount;
 
-        private bool bisPress = true, isfinish, IsRebuild = false, Admin = false, TimerLock = false, OutStock = false, AllowPass = false, bIsNewVersion, bIsClickable, bIsNeedOK;
-        private bool bDevice1, bDevice2, bDevice3, bPrinter;
+        private bool bisPress=true,isfinish, IsRebuild = false, Admin = false, TimerLock = false, OutStock = false, AllowPass = false, bIsNewVersion, bIsClickable, bIsNeedOK;
+        private bool bDevice1, bDevice2, bDevice3,bPrinter;
         private static string EUCode = "";
         private static DataSet ds = new DataSet();
         private static DataSet Mk = new DataSet();
@@ -62,11 +62,8 @@ namespace JssxSeizouPC
         SoundPlayer GetNew = new SoundPlayer("GetNew.wav");
         SoundPlayer Okay = new SoundPlayer("Okay.wav");
         SerialPort port1;
-        public string PlanNo, BigKanbanNo = "", SmallKanbanNo, LabelNo, UserName, Lines, FullCom, sPrintIP;
-        public bool bisAllowScan = false;    //控制是否可以扫描。
-                                             //量产品以外的，量产品HVPT 属于分类A，下机状态才可以扫描，
-                                             //量产品不带HVPT的属于分类B。上机状态才可以扫描
-        #endregion
+        public string PlanNo, BigKanbanNo = "", SmallKanbanNo, LabelNo, UserName, Lines, FullCom,sPrintIP;
+        #endregion 
 
         public MainWindow()
         {
@@ -84,7 +81,7 @@ namespace JssxSeizouPC
             bIsNewVersion = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["bIsNewVersion"]);
             bIsClickable = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["bIsClickable"]);
             bIsNeedOK = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["bIsNeedOK"]);
-            sPrintIP = System.Configuration.ConfigurationManager.AppSettings["PrintIP"];
+            sPrintIP= System.Configuration.ConfigurationManager.AppSettings["PrintIP"];
             if (Lines == "0")
             {
                 MessageBox.Show("获取线别失败，程序即将关闭。");
@@ -99,7 +96,7 @@ namespace JssxSeizouPC
                 Btn_MSSubmit2.Visibility = Visibility.Hidden;
                 Tb_MSSTART.Visibility = Visibility.Hidden;
                 Tb_MSEND.Visibility = Visibility.Hidden;
-                Btn_MSSubmit.Visibility = Visibility.Hidden;
+                Btn_MSSubmit.Visibility = Visibility.Hidden; 
             }
             if (bIsNeedOK)
             {
@@ -143,14 +140,14 @@ namespace JssxSeizouPC
 
             string LN = System.Configuration.ConfigurationManager.AppSettings["LinesName"];
             if (Btn_Shutdown.Content.ToString() == "▶上机")
-            {//按了之后上机
+            {
 
 
                 string sql_Working = "insert into JSSX_Line_Working_Status(iStatusCode, cLineCode, cStartTime,cDate,cWorkShift) values(1, '" + LN + "', GETDATE(),iif(right(CONVERT(varchar(20),getdate(),120),8) <'07:00:00', CONVERT(varchar(10),DATEADD(day,-1,getdate()),120),CONVERT(varchar(10),getdate(),120)),iif(right( CONVERT(varchar(20), getdate(),120),8) between '07:30:00' and '19:30:00' ,'D','N'))";
                 DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Working);
                 Btn_Shutdown.Content = "■下机";
                 Btn_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF0000"));
-                //下机改成获取最后一台的时间
+
                 string sql_WorkingTime = "select *,CONVERT(varchar(20), cStartTime, 120) as cTime from JSSX_Line_Working_Status where cEndTime is  null and cLineCode = '" + LN + "'";
                 DataSet ds_WorkingTime = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_WorkingTime);
 
@@ -159,9 +156,8 @@ namespace JssxSeizouPC
 
             }
             else
-            {//按了之后下机
-                //string sql_Working = "update JSSX_Line_Working_Status set iStatusCode = 2, cEndTime = GETDATE() where cLineCode = '" + LN + "' and iStatusCode = 1";
-                string sql_Working = "update JSSX_Line_Working_Status set iStatusCode = 2, cEndTime = (select top 1 ScanTime from JSSX_ScanRecord_Seizou a  where a.Logger = '" + Lines + "' order by ID desc) where cLineCode = '" + LN + "' and iStatusCode = 1";
+            {
+                string sql_Working = "update JSSX_Line_Working_Status set iStatusCode = 2, cEndTime = GETDATE() where cLineCode = '" + LN + "' and iStatusCode = 1";
                 DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Working);
                 Btn_Shutdown.Content = "▶上机";
                 Btn_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF00FF00"));
@@ -169,7 +165,7 @@ namespace JssxSeizouPC
                 Lab_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF0000"));
 
             }
-            SetbisAllowScan();    //调用判断是否可以扫描的方法
+
             #endregion
 
         }
@@ -267,10 +263,10 @@ namespace JssxSeizouPC
             Tb_Timer.Content = DateTime.Now.ToString("HH:mm:ss");
 
         }
-
+        
         private void DTStatus_Tick(object sender, EventArgs e)
         {
-
+            
             //执行一次ping打印机
             bPrinter = ping(sPrintIP);
 
@@ -288,13 +284,13 @@ namespace JssxSeizouPC
             TimeSpan TSDayE = DateTime.Parse("19:00").TimeOfDay;
             TimeSpan TSNightS = DateTime.Parse("00:00").TimeOfDay;
             TimeSpan TSNightE = DateTime.Parse("07:00").TimeOfDay;
-            if (((TSNow > TSDayS && TSNow < TSDayE) || (TSNow > TSNightS && TSNow < TSNightE)) && bIsNewVersion)
+            if (((TSNow > TSDayS && TSNow < TSDayE) || (TSNow > TSNightS && TSNow < TSNightE))&&bIsNewVersion)
             {
                 string LN = System.Configuration.ConfigurationManager.AppSettings["LinesName"];
                 DataSet DS_Schedule = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select distinct aa.cPNumber,bb.cWorkShift from (select distinct 'JXPO' + right(left(a.Number, 14), 10) + b.WorkShift as cPNumber from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber where a.Line =  '" + LN + "' and (b.WorkShift = 'D' or b.WorkShift = 'N') and CONVERT(varchar(10), a.PlanTime, 120) + b.WorkShift > iif(right(CONVERT(varchar(20), GETDATE(), 120),8) between '00:00:00' and '08:00:00',CONVERT(varchar(10), dateadd(day,-1,GETDATE()), 120),CONVERT(varchar(10), GETDATE(), 120) ) + iif(right(CONVERT(varchar(20), GETDATE(), 120), 8) between '08:00:00' and '19:59:59', 'D', 'N') and a.Isfinish = 0) aa left join JSSX_ProductionPlan bb on aa.cPNumber = bb.cPNumber and bb.isdelete = 0 order by aa.cPNumber");
-
-                if (DS_Schedule != null && DS_Schedule.Tables[0].Rows.Count != 0 && DS_Schedule.Tables[0].Rows[0][1] != null && DS_Schedule.Tables[0].Rows[0][1].ToString() == "")
-                {
+                
+                if (DS_Schedule != null && DS_Schedule.Tables[0].Rows.Count != 0&& DS_Schedule.Tables[0].Rows[0][1]!=null && DS_Schedule.Tables[0].Rows[0][1].ToString()=="")
+                {                     
                     Im_Notic.Visibility = Visibility.Visible;
                 }
                 else
@@ -334,43 +330,6 @@ namespace JssxSeizouPC
                 DataAnalysis(Res);
             }
             Array.Clear(buf, 0, buf.Length);//数组清空
-        }
-        /// <summary>
-        /// 托盘扫描
-        /// </summary>
-        /// <param name="Res">托盘二维码的编号</param>
-        public void ContainerBinding(string Res)
-        {
-
-            if (BigKanbanNo == "")
-            {
-                ErrorSilen("请先扫描看板", "Z0");
-                return;
-            }
-
-
-            //update JSSX_Stock_ShippingDepartment set cTrayNo = '' where Series = ''
-            string sSql_Tray = "update JSSX_Stock_ShippingDepartment set cTrayNo = '" + Res + "' where Series = '" + BigKanbanNo + "';";
-
-            //Exec TrayInfoUpdate 'JXFS819B0003', '','','清洁人员','清洁扫描枪','Q';   
-            sSql_Tray = sSql_Tray + "Exec TrayInfoUpdate '" + Res + "', '','" + BigKanbanNo + "','生产照合','" + Lines + "','Z' ";
-            DataSet ds_Tray = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sSql_Tray);
-
-            //bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, sSql_Tray);
-            if (ds_Tray.Tables[0].Rows.Count <= 0)
-            {
-                //Speaker("托盘照合失败。", 4);
-                ShowMessage("执行SQL语句失败！" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
-                return;
-            }
-            if (ds_Tray.Tables[0].Rows[0][0].ToString() != "操作成功！")
-            {
-                //Speaker(ds_Tray.Tables[0].Rows[0][0].ToString(), 4);
-                ErrorSilen(ds_Tray.Tables[0].Rows[0][0].ToString(), "Z0");
-                return;
-            }
-            Lab_Container.Content = "托盘号：" + Res;   //把托盘号显示在界面上
-
         }
 
         private void ReceiveData2(object sender, SerialDataReceivedEventArgs e)
@@ -853,7 +812,7 @@ namespace JssxSeizouPC
             Im_Notic.Visibility = Visibility.Hidden;
             ProductionOrder lo = new ProductionOrder(System.Configuration.ConfigurationManager.AppSettings["LinesName"]);
             lo.ShowDialog();
-
+           
         }
 
         private void Btn_SetOK_Click(object sender, RoutedEventArgs e)
@@ -1004,74 +963,15 @@ namespace JssxSeizouPC
             }
         }
 
-        private void Cbx_ProductSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-            SetbisAllowScan();    //调用判断是否可以扫描的方法
-        }
-
-        public void SetbisAllowScan()
-        {
-            string sUID;
-            if (Cbx_ProductSelection.SelectedIndex < 0)
-            {
-                sUID = "";
-            }
-            else
-            {
-                DataRowView aa = (DataRowView)Cbx_ProductSelection.SelectedItem;
-                sUID = aa["UID"].ToString();
-
-            }
-            //string sUID = Cbx_ProductSelection.Text.ToString();
-            //sUID = sUID.Substring(sUID.Length - 10);
-
-            string sLineName = System.Configuration.ConfigurationManager.AppSettings["LinesName"];
-            //select * from JSSX_Products a left join JSSX_DailyPlan_Category b on a.UniqueID = b.UniqueID where a.UniqueID = 'JX00000206'  and b.LineCategory = 'KD线' and a.TrayType = '量产' and  (not (CONVERT(varchar(10), GETDATE(), 120) between b.cHVPTTimeBegin and b.cHVPTTimeEnd) or cHVPTTimeBegin is null)
-            //这条有返回行，则为标准量产品，没返回行，则为HVPT量产品，或者不是量产品
-            DataSet ds = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select * from JSSX_Products a left join JSSX_DailyPlan_Category b on a.UniqueID = b.UniqueID where a.UniqueID = '" + sUID + "'  and b.LineCategory = '" + sLineName + "' and a.TrayType = '量产' and  (not (CONVERT(varchar(10), GETDATE(), 120) between b.cHVPTTimeBegin and b.cHVPTTimeEnd) or cHVPTTimeBegin is null)");
-            if (ds.Tables[0].Rows.Count > 0 & Btn_Shutdown.Content.ToString() == "■下机")
-            {
-                bisAllowScan = true;     //量产品，并且上机状态的情况。可以扫描
-            }
-            else if (ds.Tables[0].Rows.Count <= 0 & Btn_Shutdown.Content.ToString() == "▶上机")
-            {
-                bisAllowScan = true;     //HVPT 和非量产品，并且下机状态，可以扫描
-            }
-            else
-            {
-                bisAllowScan = false;
-            }
-        }
-
         public void DataAnalysis(string Res)
         {
             if (Res.Length <= 5)
             {
                 return;
             }
-
             this.Dispatcher.Invoke(new Action(() =>
             {
                 //Tb_MidMessage.Content += "\r\n" + Res;
-
-                //if (!bisAllowScan)
-                //{
-                //    Speaker("请确认上下机状态。", 3);
-                //    ShowMessage("请确认上下机状态。" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
-                //    ProPass(Rec_Shape, 20, 0, "#FFFF0000");
-                //   // return;
-                //}
-
-                #region  //托盘扫描调用
-                if (Res.Substring(0, 4) == "JXFS") //当扫的是托盘时进入托盘事件
-                {
-                    ContainerBinding(Res);
-                    return;
-                }
-                #endregion
-
-
                 if (Res.Length == 32)
                 {
                     DataSet ds = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select UnlockKey as UnlockKey from JSSX_KeyManager where Department='ZZ' and UnlockKey='" + Res + "' ");
@@ -1126,14 +1026,6 @@ namespace JssxSeizouPC
                         Btn_OutStock.Visibility = Visibility.Hidden;
                         Btn_OutStockAll.Visibility = Visibility.Hidden;
                         Btn_ChangeKanban.Visibility = Visibility.Hidden;
-
-                        #region  //托盘号解除绑定部分
-                        string sKanbanNo_Tray = Res.Substring(21, 10).Trim() + Res.Substring(77, 8).Trim();
-                        string sSql_Tray = "declare @cTrayNo nvarchar(20);select top 1 @cTrayNo = cTrayNo from JSSX_Stock_ShippingDepartment where Series = '" + sKanbanNo_Tray + "';Exec TrayInfoUpdate @cTrayNo, '','','生产退库','" + Lines + "','Q';";
-                        sSql_Tray = sSql_Tray + "update JSSX_Stock_ShippingDepartment set cTrayNo = '' where Series = '" + sKanbanNo_Tray + "';";
-                        DataSet ds_Tray = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sSql_Tray);
-                        Lab_Container.Content = "托盘号：";
-                        #endregion
                     }
                     else
                     {
@@ -1189,17 +1081,6 @@ namespace JssxSeizouPC
                         }
                         else
                         {
-
-                            if (!bisAllowScan)
-                            {
-                                Speaker("请确认上下机状态。", 3);
-                                ShowMessage("请确认上下机状态。" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
-                                ProPass(Rec_Shape, 20, 0, "#FFFF0000");
-                                sTemp = "";
-                                Res = "";
-                                return;
-                            }
-
                             PlanNo = Tb_PlanNo.Content.ToString();
                             BigKanbanNo = Tb_BigKanbanNo.Content.ToString();
                             DataAnalysis_CarLabel(Res);//DC.Start();
@@ -1334,14 +1215,14 @@ namespace JssxSeizouPC
 
         private void DataAnalysis_CarLabel(string Res)
         {
-            if (!bisPress)
+            if ( !bisPress)
             {
                 Speaker("请点击OK确认。", 5);
                 ShowMessage("请点击OK确认。" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
                 ProPass(Rec_Shape, 20, 0, "#FFFF0000");
                 return;
             }
-            if (sTemp == Res)
+            if (sTemp == Res )
             {
                 return;
             }
@@ -1349,7 +1230,7 @@ namespace JssxSeizouPC
             {
                 bisPress = false;
             }
-
+            
             Btn_SetOK.Foreground = new SolidColorBrush(Colors.Red);
             //this.Dispatcher.Invoke(new Action(() =>
             //{
@@ -1372,7 +1253,7 @@ namespace JssxSeizouPC
             int iQuantityCompletion = 0;//此看板的数据
             int iQuantityCompletion2 = 0;//整个计划的数据
 
-            if (Customer_Codecontain && CarLabel.Length >= 3 && Res.Length > 4)
+            if (Customer_Codecontain&& CarLabel.Length >= 3 && Res.Length > 4)
             {
                 try
                 {
@@ -1392,24 +1273,6 @@ namespace JssxSeizouPC
                         ProPass(Rec_Shape, 20, 0, "#FFFF0000");
                         return;
                     }
-                    #region  //托盘照合的部分
-                    DataSet ds_Tray = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select * from JSSX_Line where LineNumber =  '" + Lines + "' and bisScanTray = 1");
-                    if (ds_Tray.Tables[0].Rows.Count > 0)    //判断这条线是否已经开启的托盘照合
-                    {
-                        //加入一段判断UID是不是铁托盘，只有铁托盘需要照托盘码
-
-                        DataSet ds_TrayType = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select * from JSSX_Products where UniqueID = '" + UniqueID + "' and TrayType = '量产'");
-
-                        if (!OutStock && Lab_Container.Content.ToString() == "托盘号：" && ds_TrayType.Tables[0].Rows.Count > 0 && !IsRebuild)   //判断当前有没有照合托盘
-                        {
-                            Speaker("没有照合托盘。", 3);
-                            ShowMessage("没有照合托盘。" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
-                            ProPass(Rec_Shape, 20, 0, "#FFFF0000");
-                            return;
-                        }
-                    }
-                    #endregion
-
                     //ds = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select top 1 status from JSSX_ScanRecord_Seizou  where (ScanResult='" + Res + "' ) and (status='OK'or status='RM')");
                     if (DS_30Days.Tables[0].Select("ScanResult='" + Res + "' and Status <>'SC'").Length == 0 || IsRebuild)
                     {
@@ -1437,7 +1300,7 @@ namespace JssxSeizouPC
                         {
                             //新年来之后做一个1分钟刷新一次明细表的功能
                             //INKANBAN表可以把已经完结的都清掉
-                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_Stock_In_SerialNoRecord (InStockNumber,UniqueID,SerialNo,Complement,Creator,DayNight) values('EU','" + UniqueID + "',(select right((select 100000000+(select max(SerialNo)+1 as 流水号 from JSSX_Stock_In_SerialNoRecord)),8)),'0','" + Lines + "','F'); insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "','" + UniqueID + "'+(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord),'" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(HOUR,-8, GETDATE()),120))");
+                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_Stock_In_SerialNoRecord (InStockNumber,UniqueID,SerialNo,Complement,Creator,DayNight) values('EU','" + UniqueID + "',(select right((select 100000000+(select max(SerialNo)+1 as 流水号 from JSSX_Stock_In_SerialNoRecord)),8)),'0','" + Lines + "','F'); insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "','" + UniqueID  + "'+(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord),'" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(HOUR,-8, GETDATE()),120))");
                             if (!bTran)
                             {
                                 Speaker("铭板照合失败。", 3);
@@ -1452,12 +1315,12 @@ namespace JssxSeizouPC
                             iQuantityCompletion = DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK'").Length;//此看板的数据
                             iQuantityCompletion2 = DS_30Days.Tables[0].Select("UniqueID='" + UniqueID + "' and Status ='OK' and InStockNumber like  '" + PlanNo.Substring(0, 14) + "%'").Length;//当天的总量
                             //写入IN_KANBAN是为了展示未完结的看板的数量，写入明细表是为了统计数量
-                            //bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, " ; update top(1) JSSX_Stock_In_Kanban set QuantityCompletion = '" + iQuantityCompletion + "'  where KanbanNo = '" + UniqueID + Series + "' and Isfinish!= 1; update JSSX_Stock_In_Detailed  set QuantityCompletion = '" + iQuantityCompletion2 + "' where InStockNumber = '" + PlanNo + "' and  UniqueID = '" + UniqueID + "' and  WorkShift = iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N')");
-                            //if (!bTran)
-                            //{
-                            //    Speaker("铭板照合失败。写入inkanban和明细表时出错", 3);
-                            //    return;
-                            //}
+                            bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, " ; update top(1) JSSX_Stock_In_Kanban set QuantityCompletion = '" + iQuantityCompletion + "'  where KanbanNo = '" + UniqueID + Series + "' and Isfinish!= 1; update JSSX_Stock_In_Detailed  set QuantityCompletion = '" + iQuantityCompletion2 + "' where InStockNumber = '" + PlanNo + "' and  UniqueID = '" + UniqueID + "' and  WorkShift = iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N')");
+                            if (!bTran)
+                            {
+                                Speaker("铭板照合失败。写入inkanban和明细表时出错", 3);
+                                return;
+                            }
 
                             DataSet Ds_SerialNo = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select top 1 RIGHT( ScanResult2,8) as ScanResult2 from JSSX_ScanRecord_Seizou  where ScanResult='" + Res + "' and  status='OK'  ");
                             if (Ds_SerialNo == null || Ds_SerialNo.Tables[0].Rows.Count == 0)
@@ -1467,7 +1330,7 @@ namespace JssxSeizouPC
                             }
                             SN = Ds_SerialNo.Tables[0].Rows[0]["ScanResult2"].ToString();
                             PLCLock.Start();
-                            thread.Start();
+                            thread.Start(); 
                         }
                         else
                         {
@@ -1480,17 +1343,18 @@ namespace JssxSeizouPC
                             DS_30Days.Tables[0].Rows.Add(DRDaysNew);
                             iQuantityCompletion = DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK'").Length;
                             iQuantityCompletion2 = DS_30Days.Tables[0].Select("UniqueID='" + UniqueID + "' and Status ='OK' and InStockNumber like '%" + PlanNo.Substring(0, 14) + "%'").Length;
-                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(HOUR,-8, GETDATE()),120));");
+                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(HOUR,-8, GETDATE()),120));update JSSX_Stock_In_Detailed  set QuantityCompletion = '" + iQuantityCompletion2 + "'  where InStockNumber = '" + PlanNo + "' and  UniqueID = '" + UniqueID + "' and  WorkShift = iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N')");
                             if (!bTran)
                             {
-                                Speaker("铭板照合失败。", 3);
+                                Thread.Sleep(5000);
+                                sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(HOUR,-8, GETDATE()),120));update JSSX_Stock_In_Detailed  set QuantityCompletion = '" + iQuantityCompletion2 + "'  where InStockNumber = '" + PlanNo + "' and  UniqueID = '" + UniqueID + "' and  WorkShift = iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N')");
                                 return;
                             }
                         }
                         Ds_ShowLabel.Clear();
                         foreach (DataRow DR in DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK' "))
                         {
-                            Ds_ShowLabel.ImportRow(DR);
+
                         }
                         Dg_Show.ItemsSource = Ds_ShowLabel.DefaultView;
                         Tb_Completed.Text = iQuantityCompletion + "/" + Amount.ToString();
@@ -1525,7 +1389,7 @@ namespace JssxSeizouPC
             Btn_Rebuild.Visibility = Visibility.Hidden;
             Btn_OutStock.Visibility = Visibility.Hidden;
             Btn_OutStockAll.Visibility = Visibility.Hidden;
-            Btn_ChangeKanban.Visibility = Visibility.Hidden;
+            Btn_ChangeKanban.Visibility = Visibility.Hidden; 
             // }));
         }
 
@@ -1581,7 +1445,7 @@ namespace JssxSeizouPC
                 if (Os != null && Os.Tables[0].Rows.Count != 0)
                 {
                     string sKanbanNo = Os.Tables[0].Rows[0]["KanbanNo"].ToString();
-                    bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "update JSSX_ScanRecord_Seizou set Status='SC' where ScanResult='" + sLN + "';update JSSX_Stock_ShippingDepartment set Status='SP' WHERE UniqueID='" + UniqueID + "' and Series='" + sKanbanNo + "' ;insert into ErrorLog (sMessage,sLevel,sLogger,sDepartment,sException) values( '执行了【退库】操作','SC','" + UserName + "','" + Lines + "','" + sLN + "')");
+                    bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "update JSSX_ScanRecord_Seizou set Status='SC' where ScanResult='" + sLN + "';update top(1) JSSX_Stock_In_Kanban set QuantityCompletion-=1,Isfinish=0, CompleteTime=(CONVERT([nvarchar](20),getdate(),(120))),Status='SP' where KanbanNo= '" + sKanbanNo + "'  ;update JSSX_Stock_ShippingDepartment set Status='SP' WHERE UniqueID='" + UniqueID + "' and Series='" + sKanbanNo + "' ;insert into ErrorLog (sMessage,sLevel,sLogger,sDepartment,sException) values( '执行了【退库】操作','SC','" + UserName + "','" + Lines + "','" + sLN + "')");
                     if (!bTran)
                     {
                         Speaker("解除绑定失败！", 3);
@@ -1656,11 +1520,11 @@ namespace JssxSeizouPC
                     Tb_Completed.Text = "";
                     if (EUCode != "0" && EUCode != "9" && EUCode != "10" && Amount != 1)//EU箱且不是补用品
                     {
-                        sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, " update JSSX_Stock_ShippingDepartment set Status='EU' WHERE UniqueID='" + UniqueID + "' and Series='" + UniqueID + Series + "' and SPKanban is null ");
+                        sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "update JSSX_Stock_In_Kanban set QuantityCompletion=Volume,Status='FP',Isfinish=1, CompleteTime=(CONVERT([nvarchar](20),getdate(),(120))) where  KanbanNo='" + UniqueID + Series + "';update JSSX_Stock_ShippingDepartment set Status='EU' WHERE UniqueID='" + UniqueID + "' and Series='" + UniqueID + Series + "' and SPKanban is null ");
                     }
                     else
                     {
-                        sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "update JSSX_Stock_ShippingDepartment set Status='FP' WHERE UniqueID='" + UniqueID + "' and Series='" + UniqueID + Series + "' ");
+                        sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "update JSSX_Stock_In_Kanban set QuantityCompletion=Volume,Status='FP',Isfinish=1, CompleteTime=(CONVERT([nvarchar](20),getdate(),(120))) where  KanbanNo='" + UniqueID + Series + "';update JSSX_Stock_ShippingDepartment set Status='FP' WHERE UniqueID='" + UniqueID + "' and Series='" + UniqueID + Series + "' ");
                     }
                     //ProPass(Rec_Shape, 20, 0, "#FF00FF00");
                     isfinish = false;
@@ -1688,15 +1552,9 @@ namespace JssxSeizouPC
             Tb_BigKanbanNo.Content = BigKanbanNo;
             UniqueID = "";
             Series = "";
-            #region  托盘扫描相关初始化
-            string sSql_Tray = "Exec TrayInfoUpdate '" + Lab_Container.Content.ToString().Substring(4) + "', '','" + BigKanbanNo + "','生产照合','" + Lines + "','M' ";
-            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, sSql_Tray);
-            Lab_Container.Content = "托盘号：";
-            #endregion
-
             GC.Collect();
         }
-
+      
         private void ButtonLocker()
         {
             tButtonLocker = new DispatcherTimer();

@@ -34,6 +34,7 @@ namespace JssxSeizouPC
                 connection.Open();
             }
         }
+
         public static void ExecuteNonQuery(string sql)
         {
             // 确保连接打开
@@ -49,6 +50,7 @@ namespace JssxSeizouPC
                 tr.Commit();
             }
         }
+
         public static void ExecuteQuery(string sql)
         {
             // 确保连接打开
@@ -74,6 +76,7 @@ namespace JssxSeizouPC
                 tr.Commit();
             }
         }
+
         // 因为SQLite是文件型数据库，可以直接删除文件。但只要数据库连接没有被回收，就无法删除文件。
         public static void DeleteDatabase(string dbName)
         {
