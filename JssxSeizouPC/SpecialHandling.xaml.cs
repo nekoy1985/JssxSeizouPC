@@ -44,7 +44,7 @@ namespace JssxSeizouPC
                 if (element != null)
                 {
                     ComboBox DgCb_Reason = tempColumn.CellTemplate.FindName("Cbx_Reason", element) as ComboBox; 
-                    DataTable dt = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "SELECT distinct cReason FROM NGProductReason ").Tables[0];
+                    DataTable dt = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "SELECT distinct cReason FROM NGProductReason ").Tables[0];
                     DgCb_Reason.ItemsSource = dt.DefaultView;
                     DgCb_Reason.DisplayMemberPath = "cReason";
                     DgCb_Reason.SelectedValuePath = "cReason";
@@ -80,7 +80,7 @@ namespace JssxSeizouPC
                     dr.Delete();
                 }
             }
-            sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, sSql);
+            sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, sSql);
             Mw.Dg_Show.ItemsSource = DG_DataList.ItemsSource;
         }
     }

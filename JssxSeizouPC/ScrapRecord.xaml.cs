@@ -32,7 +32,7 @@ namespace JssxSeizouPC
 
         protected void GetData()
         {
-            DataSet Ds_Result = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "SELECT distinct b.CarType FROM JSSX_Stock_In_Detailed  a left join JSSX_Products b on a.UniqueID=b.UniqueID WHERE   (InStockNumber = N'JXDP2018121903V04')");
+            DataSet Ds_Result = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "SELECT distinct b.CarType FROM JSSX_Stock_In_Detailed  a left join JSSX_Products b on a.UniqueID=b.UniqueID WHERE   (InStockNumber = N'JXDP2018121903V04')");
 
             DG_Inputwindows.ItemsSource = Ds_Result.Tables[0].DefaultView;
         }

@@ -38,7 +38,7 @@ namespace JssxSeizouPC
             param[0].Value = sLine;
 
 
-            DataSet ds = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql, param);
+            DataSet ds = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql, param);
             Cbx_Date.ItemsSource = ds.Tables[0].DefaultView;  // 设置下拉数据源
             Cbx_Date.DisplayMemberPath = "PlanTime";
             Cbx_Date.SelectedValuePath = "PlanTime";
@@ -52,7 +52,7 @@ namespace JssxSeizouPC
             param2[0].Value = sLine;
 
 
-            DataSet ds2 = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql2, param2);
+            DataSet ds2 = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql2, param2);
             Cbx_Date2.ItemsSource = ds2.Tables[0].DefaultView;  // 设置下拉数据源
             Cbx_Date2.DisplayMemberPath = "PlanTime";
             Cbx_Date2.SelectedValuePath = "PlanTime";
@@ -60,7 +60,7 @@ namespace JssxSeizouPC
 
             string sql_DN = "select 'D' as cWorkShift union select 'N' as cWorkShift";
 
-            DataSet ds_DN = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_DN);
+            DataSet ds_DN = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_DN);
             Cbx_WorkShift.ItemsSource = ds_DN.Tables[0].DefaultView;  // 设置下拉数据源
             Cbx_WorkShift.DisplayMemberPath = "cWorkShift";
             Cbx_WorkShift.SelectedValuePath = "cWorkShift";
@@ -88,7 +88,7 @@ namespace JssxSeizouPC
             param_Now[2].Value = Cbx_WorkShift.SelectedValue.ToString();
 
 
-            DataSet ds_Now = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Now, param_Now);
+            DataSet ds_Now = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_Now, param_Now);
             if (ds_Now.Tables[0].Rows.Count == 0)
             {
                 MessageBox.Show("没有找到生产计划，请确认日期班次");
@@ -107,7 +107,7 @@ namespace JssxSeizouPC
             param_Next[0].Value = sLine;
             param_Next[1].Value = Cbx_Date.SelectedValue.ToString();
             param_Next[2].Value = Cbx_WorkShift.SelectedValue.ToString();
-            ds_Next = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Next, param_Next);
+            ds_Next = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_Next, param_Next);
             if (ds_Next.Tables[0].Rows.Count != 0)
             {
                 DG_Next.Visibility = Visibility.Visible;
@@ -131,7 +131,7 @@ namespace JssxSeizouPC
             param_p[0].Value = sLine;
             param_p[1].Value = Cbx_Date.SelectedValue.ToString();
             param_p[2].Value = Cbx_WorkShift.SelectedValue.ToString();
-            ds_p = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_p, param_p);
+            ds_p = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_p, param_p);
             Lab_Label.Content = "本  次  排  程";
 
             if (ds_p.Tables[0].Rows.Count == 0)
@@ -146,7 +146,7 @@ namespace JssxSeizouPC
                 param_p2[0].Value = sLine;
                 param_p2[1].Value = Cbx_Date.SelectedValue.ToString();
                 param_p2[2].Value = Cbx_WorkShift.SelectedValue.ToString();
-                ds_p = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_p2, param_p2);
+                ds_p = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_p2, param_p2);
 
             }
             DG_Production.ItemsSource = ds_p.Tables[0].DefaultView;
@@ -223,7 +223,7 @@ namespace JssxSeizouPC
              };
             param_Next[0].Value = sLine;
             param_Next[1].Value = Cbx_Date2.SelectedValue.ToString();
-            ds_Next = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql_Next, param_Next);
+            ds_Next = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_Next, param_Next);
             if (ds_Next.Tables[0].Rows.Count != 0)
             {
                 DG_Next.Visibility = Visibility.Visible;
@@ -396,8 +396,8 @@ namespace JssxSeizouPC
                 sql = sql.Substring(0, sql.Length - 1);
 
                 //insert into JSSX_ProductionPlan(cProductionSequenceNo, cLine, cWorkShift, cPlanTime, cUniqueID, cJSSXInsideCode, iAmount, iSequence) values()
-                sqlHelp.ExecuteNonQuery(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "update JSSX_ProductionPlan set isdelete = 1,dDeleteTime = getdate(),cLine = cLine + REPLACE( REPLACE( CONVERT(varchar(100), GETDATE(), 120),'-',''),':','') where cPNumber = '" + JXPONumber + "' and isdelete = 0");
-                int irow = sqlHelp.ExecuteNonQuery(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, sql);
+                sqlHelp.ExecuteNonQuery(sqlHelp.SQLCon, CommandType.Text, "update JSSX_ProductionPlan set isdelete = 1,dDeleteTime = getdate(),cLine = cLine + REPLACE( REPLACE( CONVERT(varchar(100), GETDATE(), 120),'-',''),':','') where cPNumber = '" + JXPONumber + "' and isdelete = 0");
+                int irow = sqlHelp.ExecuteNonQuery(sqlHelp.SQLCon, CommandType.Text, sql);
                 if (irow == 0)
                 {
                     MessageBox.Show("提交失败，请确认是否输入了数字");
@@ -410,7 +410,7 @@ namespace JssxSeizouPC
              };
                     param[0].Value = JXPONumber;
                     param[1].Value = Cbx_Date.SelectedValue.ToString();
-                    sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.StoredProcedure, "Logistics_Plan_Parts", param);
+                    sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.StoredProcedure, "Logistics_Plan_Parts", param);
 
                     MessageBox.Show("提交成功");
                     this.Hide();

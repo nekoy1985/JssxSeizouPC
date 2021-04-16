@@ -45,7 +45,7 @@ namespace JssxSeizouPC
             Mylog.Error("登陆成功");
             string sLine = int.Parse(Bt.ToolTip.ToString()).ToString("00");
             config.AppSettings.Settings["Lines"].Value = sLine;
-            DataSet LineInfo = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text,
+            DataSet LineInfo = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text,
                 "select LineCode,bIsNewVersion,Devices,bIsClickable,bIsNeedOK,cIP1 from [dbo].[JSSX_Line] where LineNumber='" + sLine + "' ");
             config.AppSettings.Settings["LinesName"].Value = LineInfo.Tables[0].Rows[0]["LineCode"].ToString();
             config.AppSettings.Settings["Devices"].Value = LineInfo.Tables[0].Rows[0]["Devices"].ToString();

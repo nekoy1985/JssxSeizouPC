@@ -36,13 +36,13 @@ namespace JssxSeizouPC
         {
             string text = (sender as Button).Content.ToString();
             bIsok = true;
-            sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "Insert into NGProductRecord(cReason,cMeiBan,cLine) values('" + text + "','" + Lb_LabelNo.Text + "','" + slines + "')");
+            sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "Insert into NGProductRecord(cReason,cMeiBan,cLine) values('" + text + "','" + Lb_LabelNo.Text + "','" + slines + "')");
             this.Close();
         }
 
         private void CreatButton()
         {
-            DataTable dt = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "SELECT distinct CONVERT(nvarchar(20), id)+'.'+cReason as cReason,id FROM NGProductReason where cline= '" + slines + "' order by id asc ").Tables[0];
+            DataTable dt = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "SELECT distinct CONVERT(nvarchar(20), id)+'.'+cReason as cReason,id FROM NGProductReason where cline= '" + slines + "' order by id asc ").Tables[0];
             //Cbx_Reason.ItemsSource = dt.DefaultView;
             //Cbx_Reason.SelectedValuePath = "cReason";
             //Cbx_Reason.DisplayMemberPath = "cReason";

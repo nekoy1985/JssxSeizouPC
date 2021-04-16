@@ -20,7 +20,7 @@ namespace JssxSeizouPC
         {
             InitializeComponent();
             BindPreviewMouseUpEvent();
-            DataSet dsCarTypes = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select ROW_NUMBER() over(order by InStocknumber) as ID,a.JssxInsideCode as 背番,TrayType+'__'+CarType+'__'+WorkShift as 车型, Amount as 总量,QuantityCompletion as 完成,a.JssxCode as 社番,b.CarLabel as 铭板信息,a.CustomerCode as 客番,WorkShift as 班次,b.UniqueID as UID  from JSSX_Stock_In_Detailed as a left join [dbo].[JSSX_Products] as b on a.UniqueID=b.UniqueID and b.Revoked=0 where InStocknumber='" + sPlanNo + "' and isfinish=0 order by 班次 asc");
+            DataSet dsCarTypes = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select ROW_NUMBER() over(order by InStocknumber) as ID,a.JssxInsideCode as 背番,TrayType+'__'+CarType+'__'+WorkShift as 车型, Amount as 总量,QuantityCompletion as 完成,a.JssxCode as 社番,b.CarLabel as 铭板信息,a.CustomerCode as 客番,WorkShift as 班次,b.UniqueID as UID  from JSSX_Stock_In_Detailed as a left join [dbo].[JSSX_Products] as b on a.UniqueID=b.UniqueID and b.Revoked=0 where InStocknumber='" + sPlanNo + "' and isfinish=0 order by 班次 asc");
             Cbx_ProductSelection.SelectedValuePath = "UID";
             Cbx_ProductSelection.DisplayMemberPath = "车型";
             Cbx_ProductSelection.ItemsSource = dsCarTypes.Tables[0].DefaultView;
@@ -109,7 +109,7 @@ namespace JssxSeizouPC
 
         private void Cbx_ProductSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataSet dsCarTypes = sqlHelp.ExecuteDataSet(sqlHelp.ConnectionStringLocalTransaction, CommandType.Text, "select distinct cPJSSXCode as 社番,cPInsideCode as 背番,cPChineseName as 部品名称,'\\QRCode\\123.PNG' as FullPath,JBR.cPartsUniqueID AS UID from (select cRelationID from [dbo].[JSSX_BOM_Product]  WHERE  cProductUID='" + Cbx_ProductSelection.SelectedValue.ToString() + "')  AS JBP  LEFT JOIN (SELECT cRelationID,cPartsUniqueID, SUM(iQty) AS iQty FROM JSSX_BOM_Relation where  bIsNowUseParts = 0 and cLvl!='001' group by cRelationID,cPartsUniqueID)  AS JBR ON  JBR.cRelationID=JBP.cRelationID  LEFT JOIN [dbo].[JSSX_BOM_Parts] AS JBP2 ON  JBR.cPartsUniqueID=JBP2.cPartsUniqueID");
+            DataSet dsCarTypes = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select distinct cPJSSXCode as 社番,cPInsideCode as 背番,cPChineseName as 部品名称,'\\QRCode\\123.PNG' as FullPath,JBR.cPartsUniqueID AS UID from (select cRelationID from [dbo].[JSSX_BOM_Product]  WHERE  cProductUID='" + Cbx_ProductSelection.SelectedValue.ToString() + "')  AS JBP  LEFT JOIN (SELECT cRelationID,cPartsUniqueID, SUM(iQty) AS iQty FROM JSSX_BOM_Relation where  bIsNowUseParts = 0 and cLvl!='001' group by cRelationID,cPartsUniqueID)  AS JBR ON  JBR.cRelationID=JBP.cRelationID  LEFT JOIN [dbo].[JSSX_BOM_Parts] AS JBP2 ON  JBR.cPartsUniqueID=JBP2.cPartsUniqueID");
             Lbx_Results.DataContext = dsCarTypes;
         }
 
@@ -134,7 +134,7 @@ namespace JssxSeizouPC
             {
                 DataRowView selectedText = (DataRowView)Lbx_Results.SelectedItem;
                 string sUID = selectedText.Row.ItemArray[4].ToString();
-                bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_Logistics_Supplement (cPartsUniqueID, iQuantity,cLogger,cInStockNumber) values( '" + sUID + "','" + Tb_quantity.Text + "','" + sLineNo + "','" + sPlanNo + "')");
+                bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "insert into JSSX_Logistics_Supplement (cPartsUniqueID, iQuantity,cLogger,cInStockNumber) values( '" + sUID + "','" + Tb_quantity.Text + "','" + sLineNo + "','" + sPlanNo + "')");
                 if (bTran)
                 {
                     this.Close();
