@@ -1307,11 +1307,12 @@ namespace JssxSeizouPC
                 ErrorSilen("【大看板】收容数不对。这张看板的收容数是：" + Amount.ToString(), "3");
                 return;
             } 
-            DataSet ds = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select KanbanNo from JSSX_Stock_In_Kanban where KanbanNo='" + UniqueID + Series + "'");
+            DataSet ds = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select Series from JSSX_Stock_ShippingDepartment where Series='" + UniqueID + Series + "'");
             Ds_ShowLabel = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select ROW_NUMBER() over(order by InStocknumber) as ID,ScanTime,ScanResult,ScanResult2,KanbanNo,InStocknumber,Status from [dbo].[JSSX_ScanRecord_Seizou] where KanbanNo='" + UniqueID + Series + "' AND Status='OK'  ");
             Dg_Show.ItemsSource = Ds_ShowLabel.Tables[0].DefaultView;
             Tb_Completed.Text = Ds_ShowLabel.Tables[0].Rows.Count.ToString() + "/" + Amount.ToString();
             iAmount = Ds_ShowLabel.Tables[0].Rows.Count; 
+
             //照看板出全部小看板
             //for (int i = 0; i < 12; i++)
             //{
@@ -1328,7 +1329,7 @@ namespace JssxSeizouPC
             if (ds == null || ds.Tables[0].Rows.Count == 0)
             {
                 // Completed.Start();//获取已照合数量
-                bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "insert into JSSX_Stock_In_Kanban (InStockNumber,KanbanNo,JSSXInsideCode,JssxCode,CustomerNo,CustomerCode,Volume,UniqueID,FullCode) values('" + PlanNo + "','" + UniqueID + Series + "','" + JssxInsideCode + "','" + JssxCode + "','" + CustomerNo + "','" + CustomerCode + "','" + Amount + "','" + UniqueID + "','" + Res + "');insert into JSSX_Stock_ShippingDepartment (UniqueID,Series,CustomerNo,JSSXInsideCode,JSSXCode,volume,ProducedTime,Status,EUCode,InStockNumber) select '" + UniqueID + "','" + UniqueID + Series + "','" + CustomerNo + "','" + JssxInsideCode + "','" + JssxCode + "','" + Amount + "',(CONVERT([nvarchar](20),getdate(),(120))),'SP','" + EUCode + "','" + Tb_PlanNo.Content.ToString() + "' WHERE NOT EXISTS(SELECT ID FROM JSSX_Stock_ShippingDepartment WHERE UniqueID='" + UniqueID + "' and Series='" + UniqueID + Series + "')");//iif('" + CustomerNo.Substring(0, 2) + "'='01' or '" + CustomerNo.Substring(0, 2) + "'='02' or '" + CustomerNo.Substring(0, 2) + "'='03','FP','SP')
+                bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, " insert into JSSX_Stock_ShippingDepartment (UniqueID,Series,CustomerNo,JSSXInsideCode,JSSXCode,volume,ProducedTime,Status,EUCode,InStockNumber) select '" + UniqueID + "','" + UniqueID + Series + "','" + CustomerNo + "','" + JssxInsideCode + "','" + JssxCode + "','" + Amount + "',(CONVERT([nvarchar](20),getdate(),(120))),'SP','" + EUCode + "','" + Tb_PlanNo.Content.ToString() + "' WHERE NOT EXISTS(SELECT ID FROM JSSX_Stock_ShippingDepartment WHERE UniqueID='" + UniqueID + "' and Series='" + UniqueID + Series + "')");//iif('" + CustomerNo.Substring(0, 2) + "'='01' or '" + CustomerNo.Substring(0, 2) + "'='02' or '" + CustomerNo.Substring(0, 2) + "'='03','FP','SP')
                 if (!bTran)
                 {
                     Speaker("读取看板失败，重新照合。", 4);
@@ -1341,16 +1342,15 @@ namespace JssxSeizouPC
             }
             else
             {
-                ds = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select KanbanNo from JSSX_Stock_In_Kanban where KanbanNo='" + UniqueID + Series + "' and Volume=QuantityCompletion");
-                if (ds == null || ds.Tables[0].Rows.Count == 0)
+                int iLabelCounts= DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK'").Length; 
+                if (iLabelCounts<Amount)
                 {
                     Completed.Start();//获取已照合数量
                     ErrorSilen("【大看板】发现未完结数据！", "Z0");
                 }
                 else if (Admin)
                 {
-                    Completed.Start();//获取已照合数量
-                    return;
+                    Completed.Start();//获取已照合数量                   
                 }
 
             }
@@ -1359,6 +1359,15 @@ namespace JssxSeizouPC
 
         private void DataAnalysis_CarLabel(string Res)
         {
+            Thread Completed = new Thread(Show_completed);
+            int iLabelCounts = DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK'").Length;
+            if (iLabelCounts>= Amount)
+            { 
+                Completed.Start();
+                Speaker("这张看板已经满了，需要换一张之后重新扫描。", 5);
+                ShowMessage("这台产品需要重新扫描。" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
+                return;
+            }
             if (Res.Length!=icarlabelLength&& icarlabelLength!=0)
             {
                 ShowMessage("长度不对.实物:"+ Res.Length.ToString() +",系统:"+ icarlabelLength.ToString() + "-----" + DateTime.Now.ToString("HH:mm:ss"));
@@ -1387,7 +1396,7 @@ namespace JssxSeizouPC
             string time = System.DateTime.Now.ToString("yyyyMMddHHmm");//日产伪流水号
                                                                        //Tb_MidMessage.Text += "\r\n" + "";
             SmallKanbanNo = "";
-            Thread Completed = new Thread(Show_completed);
+            
             Thread PLCLock = new Thread(PLCUnlock);
 
 
@@ -2100,26 +2109,6 @@ namespace JssxSeizouPC
             }
         }
 
-        private void KillProcess(string processName)
-        {
-            System.Diagnostics.Process myproc = new System.Diagnostics.Process();
-            //得到所有打开的进程
-            try
-            {
-                foreach (Process thisproc in Process.GetProcessesByName(processName))
-                {
-                    if (!thisproc.CloseMainWindow())
-                    {
-                        thisproc.Kill();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Mylog.Error(ex.Message);
-            }
-        }
-
         private void Restart()
         {
             System.Reflection.Assembly.GetEntryAssembly();
@@ -2193,28 +2182,6 @@ namespace JssxSeizouPC
 
 
             }));
-        }
-
-        private static DispatcherOperationCallback exitFrameCallback = new DispatcherOperationCallback(ExitFrame);
-
-        public static void DoEvents()
-        {
-            DispatcherFrame nestedFrame = new DispatcherFrame();
-            DispatcherOperation exitOperation = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, exitFrameCallback, nestedFrame);
-            Dispatcher.PushFrame(nestedFrame);
-            if (exitOperation.Status !=
-            DispatcherOperationStatus.Completed)
-            {
-                exitOperation.Abort();
-            }
-        }
-
-        private static Object ExitFrame(Object state)
-        {
-            DispatcherFrame frame = state as
-            DispatcherFrame;
-            frame.Continue = false;
-            return null;
         }
 
         /// <summary>
