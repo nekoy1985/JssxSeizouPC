@@ -143,7 +143,7 @@
         <TextBox x:Name="Tb_Gun2" Grid.Column="4"  Margin="2" FontSize="25" IsReadOnly="True" TextWrapping="Wrap" Background="Black" BorderBrush="Aqua" Text="枪B" Grid.Row="0" Foreground="Red" TextAlignment="Center" VerticalContentAlignment="Center" Grid.RowSpan="2"   />
         <TextBox x:Name="Tb_Gun3" Grid.Column="5"  Margin="2" FontSize="25" IsReadOnly="True" TextWrapping="Wrap" Background="Black" BorderBrush="Aqua" Text="继电器" TextAlignment="Center" VerticalContentAlignment="Center" Foreground="Red" Grid.Row="0" Grid.RowSpan="2"  />
 
-        <Label x:Name="Tb_Version" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.Column="5" Grid.Row="12" FontSize="20" Foreground="Red" Margin="97,1,98,1" />
+        <Label x:Name="Tb_Version" HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.Column="5" Grid.Row="12" FontSize="15" Foreground="Red" Margin="97,1,98,1" />
         <Label x:Name="Tb_Timer" Grid.Column="6"  Grid.Row="0" FontSize="25" HorizontalContentAlignment="Right"  Foreground="Red"  Grid.RowSpan="2" />
 
         <Border  BorderThickness="1"   Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="7"  Grid.RowSpan="4" Margin="3,10,0,0">

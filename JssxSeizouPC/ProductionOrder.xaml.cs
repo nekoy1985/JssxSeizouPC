@@ -122,7 +122,8 @@ namespace JssxSeizouPC
 
 
 
-            string sql_p = "select ROW_NUMBER() OVER (ORDER BY a.iSequence ASC) as Nid,a.cUniqueID as UniqueID,a.cJSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,a.iAmount as 生产数,isnull((select sum(iAmount) as iAmount from (select distinct cBrNumber,cUniqueID,iAmount from JSSX_Logistics_Manifest where cProductionSequenceNo = a.cPNumber and cUniqueID = a.cUniqueID) aa group by cUniqueID),0) as 物流已送,a.iSequence as 排序 from JSSX_ProductionPlan a left join JSSX_Products c on a.cUniqueID = c.UniqueID where a.cLine = @Line and a.cWorkShift = @WorkShift and a.cPlanTime = @PlanTime and a.isdelete = 0 and ismanufactured = 1 order by a.iSequence";
+            //string sql_p = "select ROW_NUMBER() OVER (ORDER BY a.iSequence ASC) as Nid,a.cUniqueID as UniqueID,a.cJSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,a.iAmount as 生产数,                                                                                                                                                                         isnull((select sum(iAmount) as iAmount from (select distinct cBrNumber,cUniqueID,iAmount from JSSX_Logistics_Manifest where cProductionSequenceNo = a.cPNumber and cUniqueID = a.cUniqueID) aa group by cUniqueID),0) as 物流已送,a.iSequence as 排序                                                                                                                          from JSSX_ProductionPlan a left join JSSX_Products c on a.cUniqueID = c.UniqueID where a.cLine = @Line and a.cWorkShift = @WorkShift and a.cPlanTime = @PlanTime and a.isdelete = 0 and ismanufactured = 1 order by a.iSequence";
+            string sql_p = "select ROW_NUMBER() OVER (ORDER BY a.iSequence ASC) as Nid,a.cUniqueID as UniqueID,a.cJSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,a.iAmount as 生产数,isnull((select Max(iAmount) as iAmount from (select a1.cUniqueID,sum(a1.iAmount / b1.iConsume) as iAmount,a1.cPutRack from JSSX_Logistics_Manifest a1 left join JSSX_ProductionPlan_Parts b1 on a1.cProductionSequenceNo = b1.cPNumber and a1.cUniqueID = b1.cUniqueID and a1.cPutRack = b1.cPutRack and b1.bisdelete = 0 where a1.cProductionSequenceNo = a.cPNumber and a1.cUniqueID = a.cUniqueID and a1.bIsEnabled = 0 group by a1.cUniqueID,a1.cPutRack,b1.iConsume) aa group by cUniqueID),0) as 物流已送,a.iSequence as 排序,a.bisNodemand as 特殊 from JSSX_ProductionPlan a left join JSSX_Products c on a.cUniqueID = c.UniqueID where a.cLine = @Line and a.cWorkShift = @WorkShift and a.cPlanTime = @PlanTime and a.isdelete = 0 and ismanufactured = 1 order by a.iSequence";
             SqlParameter[] param_p = {
                  new SqlParameter("@Line", System.Data.SqlDbType.Char),
                  new SqlParameter("@PlanTime", System.Data.SqlDbType.Char),
@@ -137,7 +138,7 @@ namespace JssxSeizouPC
             if (ds_p.Tables[0].Rows.Count == 0)
             {
                 Lab_Label.Content = "本  次  排  程 (未排)";
-                string sql_p2 = "select ROW_NUMBER() OVER (ORDER BY b.iSequence ASC) as Nid,b.UniqueID,b.JSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,sum(b.Amount) as 生产数,0 as 物流已送,b.iSequence as 排序 from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber left join JSSX_Products c on b.UniqueID = c.UniqueID where a.Line = @Line and a.PlanTime =@PlanTime and a.Isfinish is not null  and b.WorkShift = @WorkShift and b.Amount != 0  and ismanufactured = 1 group by b.UniqueID,b.JSSXInsideCode,c.TrayType ,c.CarType ,b.iSequence  order by b.iSequence";
+                string sql_p2 = "select ROW_NUMBER() OVER (ORDER BY b.iSequence ASC) as Nid,b.UniqueID,b.JSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,sum(b.Amount) as 生产数,0 as 物流已送,b.iSequence as 排序,0 as 特殊 from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber left join JSSX_Products c on b.UniqueID = c.UniqueID where a.Line = @Line and a.PlanTime =@PlanTime and a.Isfinish is not null  and b.WorkShift = @WorkShift and b.Amount != 0  and ismanufactured = 1 group by b.UniqueID,b.JSSXInsideCode,c.TrayType ,c.CarType ,b.iSequence  order by b.iSequence";
                 SqlParameter[] param_p2 = {
                  new SqlParameter("@Line", System.Data.SqlDbType.Char),
                  new SqlParameter("@PlanTime", System.Data.SqlDbType.Char),
@@ -157,6 +158,24 @@ namespace JssxSeizouPC
             DG_Now.Columns[6].Visibility = Visibility.Hidden;
             //DG_Production.Columns[0].Visibility = Visibility.Hidden;
             //DG_Production.Columns[0].IsReadOnly = true;
+
+            //先把表格显示出来，后面才能对行进行上色
+            if (!Window.GetWindow(DG_Production).IsVisible)
+            {
+                Window.GetWindow(DG_Production).Show();
+            }
+            DG_Production.UpdateLayout();
+
+            for (int i = 0; i < ds_p.Tables[0].Rows.Count; i++)
+            {
+                if (ds_p.Tables[0].Rows[i]["特殊"].ToString() == "True") 
+                {
+                    DataRowView drv = DG_Production.Items[i] as DataRowView;
+                    DataGridRow row = (DataGridRow)this.DG_Production.ItemContainerGenerator.ContainerFromIndex(i);
+                    row.Background = new SolidColorBrush(Colors.LightGreen);
+                }
+            }
+
         }
 
         private void Cbx_Date_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -366,6 +385,35 @@ namespace JssxSeizouPC
 
         }
 
+        private void Btn_Nodemand_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (DG_Production.SelectedIndex < 0)
+            {
+                MessageBox.Show("先选中表格的一行，才能设置");
+                return;
+            }
+            int irow = DG_Production.SelectedIndex;
+            DataRowView drv = DG_Production.Items[irow] as DataRowView;
+            DataGridRow row = (DataGridRow)this.DG_Production.ItemContainerGenerator.ContainerFromIndex(irow);
+
+            if (ds_p.Tables[0].Rows[irow]["特殊"].ToString() == "False")   //0变成1，设置颜色
+            {
+                ds_p.Tables[0].Rows[irow]["特殊"] = "True";
+                row.Background = new SolidColorBrush(Colors.LightGreen);
+                //.Items[指定的行数].BackColor="color";
+
+            }
+            else
+            {
+                ds_p.Tables[0].Rows[irow]["特殊"] = "False";
+                row.Background = new SolidColorBrush(Colors.White);
+
+            }
+            DG_Production.SelectedIndex = -1;
+            //Btn_UpDate.Focus();
+        }
+
         private void textBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             SelTB = sender as TextBox;
@@ -384,13 +432,13 @@ namespace JssxSeizouPC
             try
             {
 
-                string sql = "insert into JSSX_ProductionPlan(cPNumber, cLine, cWorkShift, cPlanTime, cUniqueID, cJSSXInsideCode, iAmount, iSequence) values ";
+                string sql = "insert into JSSX_ProductionPlan(cPNumber, cLine, cWorkShift, cPlanTime, cUniqueID, cJSSXInsideCode, iAmount, iSequence,bisNodemand) values ";
                 int iDsRow = 0;
 
                 foreach (DataRow rows in ds_p.Tables[0].Rows)
                 {
                     iDsRow++;
-                    sql = sql + "('" + JXPONumber + "','" + sLine + "','" + Cbx_WorkShift.SelectedValue.ToString() + "','" + Cbx_Date.SelectedValue.ToString() + "','" + rows["UniqueID"].ToString() + "','" + rows["背番"].ToString() + "','" + rows["生产数"].ToString() + "','" + iDsRow + "'),";
+                    sql = sql + "('" + JXPONumber + "','" + sLine + "','" + Cbx_WorkShift.SelectedValue.ToString() + "','" + Cbx_Date.SelectedValue.ToString() + "','" + rows["UniqueID"].ToString() + "','" + rows["背番"].ToString() + "','" + rows["生产数"].ToString() + "','" + iDsRow + "','"+ rows["特殊"].ToString() + "'),";
 
                 }
                 sql = sql.Substring(0, sql.Length - 1);
