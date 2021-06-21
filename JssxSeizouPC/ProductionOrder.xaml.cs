@@ -29,9 +29,9 @@ namespace JssxSeizouPC
             sLine = Line;
             InitializeComponent();
             BindPreviewMouseUpEvent();
-            string sql = @"select top 7 Number,CONVERT(varchar(10),PlanTime,120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(),120) and Isfinish is not null  
-                            union all
-                            select* from (select top 2 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime < CONVERT(varchar(10), getdate(), 120) and Isfinish is not null order by PlanTime desc) a order by PlanTime asc";
+            string sql = @"select * from (select top 7 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(), 120) and Isfinish is not null order by PlanTime asc) aa
+                           union all
+                           select * from (select top 2 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime < CONVERT(varchar(10), getdate(), 120) and Isfinish is not null order by PlanTime desc) a order by PlanTime asc";
             SqlParameter[] param = {
                  new SqlParameter("@sLine", System.Data.SqlDbType.Char),
              };
@@ -43,9 +43,9 @@ namespace JssxSeizouPC
             Cbx_Date.DisplayMemberPath = "PlanTime";
             Cbx_Date.SelectedValuePath = "PlanTime";
 
-            string sql2 = @"select top 7 Number,CONVERT(varchar(10),PlanTime,120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(),120) and Isfinish is not null 
+            string sql2 = @"select * from (select top 7 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(), 120) and Isfinish is not null order by PlanTime asc) aa
                             union all
-                            select* from (select top 7 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime < CONVERT(varchar(10), getdate(), 120) and Isfinish is not null order by PlanTime desc) a order by PlanTime asc";
+                            select * from (select top 7 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime < CONVERT(varchar(10), getdate(), 120) and Isfinish is not null order by PlanTime desc) a order by PlanTime asc";
             SqlParameter[] param2 = {
                  new SqlParameter("@sLine", System.Data.SqlDbType.Char),
              };
@@ -138,7 +138,7 @@ namespace JssxSeizouPC
             if (ds_p.Tables[0].Rows.Count == 0)
             {
                 Lab_Label.Content = "本  次  排  程 (未排)";
-                string sql_p2 = "select ROW_NUMBER() OVER (ORDER BY b.iSequence ASC) as Nid,b.UniqueID,b.JSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,sum(b.Amount) as 生产数,0 as 物流已送,b.iSequence as 排序,0 as 特殊 from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber left join JSSX_Products c on b.UniqueID = c.UniqueID where a.Line = @Line and a.PlanTime =@PlanTime and a.Isfinish is not null  and b.WorkShift = @WorkShift and b.Amount != 0  and ismanufactured = 1 group by b.UniqueID,b.JSSXInsideCode,c.TrayType ,c.CarType ,b.iSequence  order by b.iSequence";
+                string sql_p2 = "select ROW_NUMBER() OVER (ORDER BY b.iSequence ASC) as Nid,b.UniqueID,b.JSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,sum(b.Amount) as 生产数,0 as 物流已送,b.iSequence as 排序, CONVERT(bit,'0') as 特殊 from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber left join JSSX_Products c on b.UniqueID = c.UniqueID where a.Line = @Line and a.PlanTime =@PlanTime and a.Isfinish is not null  and b.WorkShift = @WorkShift and b.Amount != 0  and ismanufactured = 1 group by b.UniqueID,b.JSSXInsideCode,c.TrayType ,c.CarType ,b.iSequence  order by b.iSequence";
                 SqlParameter[] param_p2 = {
                  new SqlParameter("@Line", System.Data.SqlDbType.Char),
                  new SqlParameter("@PlanTime", System.Data.SqlDbType.Char),
@@ -387,7 +387,11 @@ namespace JssxSeizouPC
 
         private void Btn_Nodemand_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBoxResult dr = MessageBox.Show("注意，点了【需要照合但不投料的模式】的按钮，请确认。", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+            if (dr != MessageBoxResult.OK)
+            {
+                return;
+            }
             if (DG_Production.SelectedIndex < 0)
             {
                 MessageBox.Show("先选中表格的一行，才能设置");

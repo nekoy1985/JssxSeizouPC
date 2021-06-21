@@ -590,7 +590,7 @@ namespace JssxSeizouPC
             {
                 for (int i = iMSstart; i < iMSend; i++)
                 {
-                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120));";
+                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120));";
                 }
                 sSql = sSql + "update top(1) JSSX_Stock_In_Kanban set QuantityCompletion=(select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where KanbanNo='" + UniqueID + Series + "' and Status='OK')  where KanbanNo='" + UniqueID + Series + "' and Isfinish!=1;update JSSX_Stock_In_Detailed set  QuantityCompletion+= (select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where KanbanNo='" + UniqueID + Series + "' and Status='OK') where InStockNumber='" + PlanNo + "' and UniqueID ='" + UniqueID + "' and WorkShift=iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N')";
                 bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, sSql);
@@ -615,7 +615,7 @@ namespace JssxSeizouPC
                 }
                 for (int i = iMSstart; i < iMSend; i++)
                 {
-                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120));";
+                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120));";
                 }
                 sSql = sSql + "update top(1) JSSX_Stock_In_Kanban set QuantityCompletion=(select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where KanbanNo='" + UniqueID + Series + "' and Status='OK')  where KanbanNo='" + UniqueID + Series + "' and Isfinish!=1;update JSSX_Stock_In_Detailed set  QuantityCompletion= (select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where InStockNumber='" + PlanNo + "' and UniqueID ='" + UniqueID + "' and Status='OK') where InStockNumber='" + PlanNo + "' and UniqueID ='" + UniqueID + "' and WorkShift=iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N')";
                 bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, sSql);
@@ -635,7 +635,7 @@ namespace JssxSeizouPC
                 for (int i = iMSstart; i < iMSend; i++)
                 {
                     DS_Result.Rows.Add(i.ToString("0000"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), sCarLabel + i.ToString("0000"), "", UniqueID + Series, PlanNo, "OK");
-                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120));";
+                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120));";
 
                 }
                 sSql = sSql + "update top(1) JSSX_Stock_In_Kanban set QuantityCompletion=(select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where KanbanNo='" + UniqueID + Series + "' and Status='OK')  where KanbanNo='" + UniqueID + Series + "' and Isfinish!=1;update JSSX_Stock_In_Detailed set  QuantityCompletion= (select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where InStockNumber='" + PlanNo + "' and UniqueID ='" + UniqueID + "' and Status='OK') where InStockNumber='" + PlanNo + "' and UniqueID ='" + UniqueID + "' and WorkShift=iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N')";
@@ -658,7 +658,7 @@ namespace JssxSeizouPC
             {
                 for (int i = iMSstart; i < iMSend; i++)
                 {
-                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120));";
+                    sSql += " if not exists (select top 1 ScanResult from JSSX_ScanRecord_Seizou  where ScanResult= '" + sCarLabel + i.ToString("0000") + "' and Status='OK')insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + sCarLabel + i.ToString("0000") + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and   (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120));";
                 }
                 sSql = sSql + "update top(1) JSSX_Stock_In_Kanban set QuantityCompletion=(select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where KanbanNo='" + UniqueID + Series + "' and Status='OK')  where KanbanNo='" + UniqueID + Series + "' and Isfinish!=1;update JSSX_Stock_In_Detailed set  QuantityCompletion= (select count(*) from [JSSX_ScanRecord_Seizou] WITH(NOLOCK) where InStockNumber='" + PlanNo + "' and UniqueID ='" + UniqueID + "' and Status='OK') where InStockNumber='" + PlanNo + "' and UniqueID ='" + UniqueID + "' and WorkShift=iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N')";
                 bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, sSql);
@@ -1017,8 +1017,10 @@ namespace JssxSeizouPC
 
         private void Cbx_ProductSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SetbisAllowScan();    //调用判断是否可以扫描的方法
-
+            if (Cbx_ProductSelection.SelectedIndex >= 0)
+            {
+                SetbisAllowScan();    //调用判断是否可以扫描的方法
+            }
         }
 
         public void SetbisAllowScan()
@@ -1479,7 +1481,7 @@ namespace JssxSeizouPC
                             //INKANBAN表可以把已经完结的都清掉
                             bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "insert into JSSX_Stock_In_SerialNoRecord (InStockNumber,UniqueID,SerialNo,Complement,Creator,DayNight) values('EU','" + UniqueID + "',(select right((select 100000000+(select max(SerialNo)+1 as 流水号 from JSSX_Stock_In_SerialNoRecord)),8)),'0','" + Lines + "','F'); " +
                                 "insert into JSSX_ScanRecord_Seizou (ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate)" +
-                                " values( '" + Res + "','" + UniqueID + "'+(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord),'" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120))");
+                                " values( '" + Res + "','" + UniqueID + "'+(select max(SerialNo) from JSSX_Stock_In_SerialNoRecord),'" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120))");
                             if (!bTran)
                             {
                                 Speaker("铭板照合失败。", 3);
@@ -1523,7 +1525,7 @@ namespace JssxSeizouPC
                             iQuantityCompletion = DS_30Days.Tables[0].Select("KanbanNo='" + UniqueID + Series + "' and Status ='OK'").Length;
                             iQuantityCompletion2 = DS_30Days.Tables[0].Select("UniqueID='" + UniqueID + "' and Status ='OK' and InStockNumber like '%" + PlanNo.Substring(0, 14) + "%'").Length;
                             //bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.ConnectionStringLocalTransaction, "insert into JSSX_ScanRecord_Seizou (ScanTime,ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values((CONVERT([nvarchar](20),getdate(),(120))),'" + Res + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:30') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<'20:00' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120));");
-                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "insert into JSSX_ScanRecord_Seizou (ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values('" + Res + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120))");
+                            bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "insert into JSSX_ScanRecord_Seizou (ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) values('" + Res + "','','" + PlanNo + "','" + UniqueID + Series + "','OK','" + UniqueID + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120))");
                             if (!bTran)
                             {
                                 Speaker("铭板照合失败。", 3);
@@ -1625,7 +1627,7 @@ namespace JssxSeizouPC
                     string sKanbanNo = Os.Tables[0].Rows[0]["KanbanNo"].ToString();
                     //
                     bool bTran = sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "update JSSX_ScanRecord_Seizou set Status='SC' where ScanResult='" + sLN + "';" +
-                        "insert into JSSX_ScanRecord_Seizou (ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) select ScanResult,ScanResult2,InStockNumber,KanbanNo,'TS',UniqueID,Logger,WorkShift,convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120) from JSSX_ScanRecord_Seizou where ScanResult='" + sLN + "'  WAITFOR DELAY N'00:00:00.300';" +
+                        "insert into JSSX_ScanRecord_Seizou (ScanResult,ScanResult2,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) select ScanResult,ScanResult2,InStockNumber,KanbanNo,'TS',UniqueID,Logger,WorkShift,convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120) from JSSX_ScanRecord_Seizou where ScanResult='" + sLN + "'  WAITFOR DELAY N'00:00:00.300';" +
                         "update JSSX_Stock_ShippingDepartment set Status='SP' WHERE UniqueID='" + UniqueID + "' and Series='" + sKanbanNo + "' ;" +
                         "insert into ErrorLog (sMessage,sLevel,sLogger,sDepartment,sException) values( '执行了【退库】操作','SC','" + UserName + "','" + Lines + "','" + sLN + "')");
                     if (!bTran)
@@ -1706,7 +1708,7 @@ namespace JssxSeizouPC
                     if (DR2.Length == 0)
                     {
                         sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "insert into JSSX_ScanRecord_Seizou (ScanResult,InStockNumber,KanbanNo,Status,UniqueID,Logger,WorkShift,cDataDate) " +
-                            " VALUES ('" + DR.ItemArray[0] + "','" + DR.ItemArray[4] + "','" + DR.ItemArray[2] + "','OK','" + DR.ItemArray[3] + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-495, GETDATE()),120))");
+                            " VALUES ('" + DR.ItemArray[0] + "','" + DR.ItemArray[4] + "','" + DR.ItemArray[2] + "','OK','" + DR.ItemArray[3] + "','" + Lines + "',iif((right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5)>='07:45') and (right(left(CONVERT([nvarchar](20),getdate(),(120)),16),5))<='19:45' ,'D','N'),convert(varchar(10),dateadd(MINUTE,-465, GETDATE()),120))");
                     }
                 }
                 try
