@@ -29,9 +29,13 @@ namespace JssxSeizouPC
             sLine = Line;
             InitializeComponent();
             BindPreviewMouseUpEvent();
-            string sql = @"select * from (select top 7 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(), 120) and Isfinish is not null order by PlanTime asc) aa
-                           union all
-                           select * from (select top 2 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime < CONVERT(varchar(10), getdate(), 120) and Isfinish is not null order by PlanTime desc) a order by PlanTime asc";
+            string sql = @" select distinct abc.PlanTime from (
+							    select * from (select top 7 Number,CONVERT(varchar(10),PlanTime,120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(),120) and Isfinish is not null  order by PlanTime asc) aa
+                                union all
+                                select * from (select top 2 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime < CONVERT(varchar(10), getdate(), 120) and Isfinish is not null order by PlanTime desc) a 
+						        union all
+							    select distinct '' as Number, CONVERT(varchar(10),cPlanTime,120)  as PlanTime from JSSX_ProductionPlan where isdelete = 0 and cLine = @sLine and cPlanTime > CONVERT(nvarchar(10), dateadd(day,-3, getdate()),120)
+			                ) abc  order by PlanTime ";
             SqlParameter[] param = {
                  new SqlParameter("@sLine", System.Data.SqlDbType.Char),
              };
@@ -43,7 +47,7 @@ namespace JssxSeizouPC
             Cbx_Date.DisplayMemberPath = "PlanTime";
             Cbx_Date.SelectedValuePath = "PlanTime";
 
-            string sql2 = @"select * from (select top 7 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(), 120) and Isfinish is not null order by PlanTime asc) aa
+            string sql2 = @"select * from (select top 7 Number,CONVERT(varchar(10),PlanTime,120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime >= CONVERT(varchar(10),getdate(),120) and Isfinish is not null   order by PlanTime asc) aa
                             union all
                             select * from (select top 7 Number, CONVERT(varchar(10), PlanTime, 120) as PlanTime from JSSX_Stock_In where Line = @sLine and PlanTime < CONVERT(varchar(10), getdate(), 120) and Isfinish is not null order by PlanTime desc) a order by PlanTime asc";
             SqlParameter[] param2 = {
@@ -88,15 +92,42 @@ namespace JssxSeizouPC
             param_Now[2].Value = Cbx_WorkShift.SelectedValue.ToString();
 
 
+            //string sql_p = "select ROW_NUMBER() OVER (ORDER BY a.iSequence ASC) as Nid,a.cUniqueID as UniqueID,a.cJSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,a.iAmount as 生产数,                                                                                                                                                                         isnull((select sum(iAmount) as iAmount from (select distinct cBrNumber,cUniqueID,iAmount from JSSX_Logistics_Manifest where cProductionSequenceNo = a.cPNumber and cUniqueID = a.cUniqueID) aa group by cUniqueID),0) as 物流已送,a.iSequence as 排序                                                                                                                          from JSSX_ProductionPlan a left join JSSX_Products c on a.cUniqueID = c.UniqueID where a.cLine = @Line and a.cWorkShift = @WorkShift and a.cPlanTime = @PlanTime and a.isdelete = 0 and ismanufactured = 1 order by a.iSequence";
+            string sql_p = "select ROW_NUMBER() OVER (ORDER BY a.iSequence ASC) as Nid,a.cUniqueID as UniqueID,a.cJSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,a.iAmount as 生产数,isnull((select Max(iAmount) as iAmount from (select a1.cUniqueID,sum(a1.iAmount / b1.iConsume) as iAmount,a1.cPutRack from JSSX_Logistics_Manifest a1 left join JSSX_ProductionPlan_Parts b1 on a1.cProductionSequenceNo = b1.cPNumber and a1.cUniqueID = b1.cUniqueID and a1.cPutRack = b1.cPutRack and b1.bisdelete = 0 where a1.cProductionSequenceNo = a.cPNumber and a1.cUniqueID = a.cUniqueID and a1.bIsEnabled = 0 group by a1.cUniqueID,a1.cPutRack,b1.iConsume) aa group by cUniqueID),0) as 物流已送,a.iSequence as 排序,a.bisNodemand as 特殊,cPNumber from JSSX_ProductionPlan a left join JSSX_Products c on a.cUniqueID = c.UniqueID where a.cLine = @Line and a.cWorkShift = @WorkShift and a.cPlanTime = @PlanTime and a.isdelete = 0 and ismanufactured = 1 order by a.iSequence";
+            SqlParameter[] param_p = {
+                 new SqlParameter("@Line", System.Data.SqlDbType.Char),
+                 new SqlParameter("@PlanTime", System.Data.SqlDbType.Char),
+                 new SqlParameter("@WorkShift", System.Data.SqlDbType.Char),
+             };
+            param_p[0].Value = sLine;
+            param_p[1].Value = Cbx_Date.SelectedValue.ToString();
+            param_p[2].Value = Cbx_WorkShift.SelectedValue.ToString();
+            ds_p = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_p, param_p);
+
+
             DataSet ds_Now = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_Now, param_Now);
-            if (ds_Now.Tables[0].Rows.Count == 0)
+            if (ds_Now.Tables[0].Rows.Count == 0 & ds_p.Tables[0].Rows.Count == 0)
             {
                 MessageBox.Show("没有找到生产计划，请确认日期班次");
+                DG_Production.ItemsSource  = ds_p.Tables[0].DefaultView; ;
                 return;
             }
-
+            if (ds_Now.Tables[0].Rows.Count == 0 & ds_p.Tables[0].Rows.Count != 0)
+            {
+                MessageBox.Show("只显示已排计划列表，无生产计划。");
+                
+            }
             DG_Now.ItemsSource = ds_Now.Tables[0].DefaultView;
-            JXPONumber = "JXPO" + ds_Now.Tables[0].Rows[0]["Number"].ToString().Substring(4, 10) + Cbx_WorkShift.SelectedValue.ToString();
+            if (ds_Now.Tables[0].Rows.Count == 0)
+            {
+                JXPONumber = ds_p.Tables[0].Rows[0]["cPNumber"].ToString();
+            }
+            else
+            {
+                JXPONumber = "JXPO" + ds_Now.Tables[0].Rows[0]["Number"].ToString().Substring(4, 10) + Cbx_WorkShift.SelectedValue.ToString();
+            }
+
+            ds_p.Tables[0].Columns.Remove("cPNumber"); //DS删除列
 
             string sql_Next = "select b.UniqueID,b.JSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,sum(b.Amount) as 计划数,iif(c.ismanufactured = 1,'是','否') as 照合,CONVERT(varchar(10),a.PlanTime,120) as 计划日期,b.WorkShift as 班次 from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber left join JSSX_Products c on b.UniqueID = c.UniqueID where a.Line = @Line  and a.Isfinish is not null  and b.Amount != 0 and (( a.PlanTime >= @PlanTime and @WorkShift = 'D') or (a.PlanTime > @PlanTime and @WorkShift = 'N'))  group by b.UniqueID,b.JSSXInsideCode,c.TrayType,c.CarType,a.PlanTime,b.WorkShift,c.ismanufactured order by a.PlanTime,b.WorkShift";
             SqlParameter[] param_Next = {
@@ -122,17 +153,6 @@ namespace JssxSeizouPC
 
 
 
-            //string sql_p = "select ROW_NUMBER() OVER (ORDER BY a.iSequence ASC) as Nid,a.cUniqueID as UniqueID,a.cJSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,a.iAmount as 生产数,                                                                                                                                                                         isnull((select sum(iAmount) as iAmount from (select distinct cBrNumber,cUniqueID,iAmount from JSSX_Logistics_Manifest where cProductionSequenceNo = a.cPNumber and cUniqueID = a.cUniqueID) aa group by cUniqueID),0) as 物流已送,a.iSequence as 排序                                                                                                                          from JSSX_ProductionPlan a left join JSSX_Products c on a.cUniqueID = c.UniqueID where a.cLine = @Line and a.cWorkShift = @WorkShift and a.cPlanTime = @PlanTime and a.isdelete = 0 and ismanufactured = 1 order by a.iSequence";
-            string sql_p = "select ROW_NUMBER() OVER (ORDER BY a.iSequence ASC) as Nid,a.cUniqueID as UniqueID,a.cJSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,a.iAmount as 生产数,isnull((select Max(iAmount) as iAmount from (select a1.cUniqueID,sum(a1.iAmount / b1.iConsume) as iAmount,a1.cPutRack from JSSX_Logistics_Manifest a1 left join JSSX_ProductionPlan_Parts b1 on a1.cProductionSequenceNo = b1.cPNumber and a1.cUniqueID = b1.cUniqueID and a1.cPutRack = b1.cPutRack and b1.bisdelete = 0 where a1.cProductionSequenceNo = a.cPNumber and a1.cUniqueID = a.cUniqueID and a1.bIsEnabled = 0 group by a1.cUniqueID,a1.cPutRack,b1.iConsume) aa group by cUniqueID),0) as 物流已送,a.iSequence as 排序,a.bisNodemand as 特殊 from JSSX_ProductionPlan a left join JSSX_Products c on a.cUniqueID = c.UniqueID where a.cLine = @Line and a.cWorkShift = @WorkShift and a.cPlanTime = @PlanTime and a.isdelete = 0 and ismanufactured = 1 order by a.iSequence";
-            SqlParameter[] param_p = {
-                 new SqlParameter("@Line", System.Data.SqlDbType.Char),
-                 new SqlParameter("@PlanTime", System.Data.SqlDbType.Char),
-                 new SqlParameter("@WorkShift", System.Data.SqlDbType.Char),
-             };
-            param_p[0].Value = sLine;
-            param_p[1].Value = Cbx_Date.SelectedValue.ToString();
-            param_p[2].Value = Cbx_WorkShift.SelectedValue.ToString();
-            ds_p = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_p, param_p);
             Lab_Label.Content = "本  次  排  程";
 
             if (ds_p.Tables[0].Rows.Count == 0)
@@ -295,7 +315,14 @@ namespace JssxSeizouPC
                 ds_p.Tables[0].Rows[iDsRC - 1]["类型"] = ds_Next.Tables[0].Rows[irow]["类型"].ToString();
                 ds_p.Tables[0].Rows[iDsRC - 1]["车型"] = ds_Next.Tables[0].Rows[irow]["车型"].ToString();
                 ds_p.Tables[0].Rows[iDsRC - 1]["生产数"] = ds_Next.Tables[0].Rows[irow]["计划数"].ToString();
-                ds_p.Tables[0].Rows[iDsRC - 1]["Nid"] = (int.Parse(ds_p.Tables[0].Rows[iDsRC - 2]["Nid"].ToString()) + 1);
+                if (iDsRC == 1)
+                {
+                    ds_p.Tables[0].Rows[iDsRC - 1]["Nid"] = 1;
+                }
+                else
+                {
+                    ds_p.Tables[0].Rows[iDsRC - 1]["Nid"] = (int.Parse(ds_p.Tables[0].Rows[iDsRC - 2]["Nid"].ToString()) + 1);
+                }
 
 
 
@@ -382,7 +409,6 @@ namespace JssxSeizouPC
         private void DG_Production_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             popNumKeyboard.IsOpen = false;
-
         }
 
         private void Btn_Nodemand_Click(object sender, RoutedEventArgs e)
@@ -410,6 +436,7 @@ namespace JssxSeizouPC
             }
             else
             {
+               // return;
                 ds_p.Tables[0].Rows[irow]["特殊"] = "False";
                 row.Background = new SolidColorBrush(Colors.White);
 
@@ -417,6 +444,12 @@ namespace JssxSeizouPC
             DG_Production.SelectedIndex = -1;
             //Btn_UpDate.Focus();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
 
         private void textBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -465,7 +498,8 @@ namespace JssxSeizouPC
                     sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.StoredProcedure, "Logistics_Plan_Parts", param);
 
                     MessageBox.Show("提交成功");
-                    this.Hide();
+                    Environment.Exit(0);
+
 
 
                 }
@@ -474,6 +508,49 @@ namespace JssxSeizouPC
             {
 
                 MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void Btn_Remove_Click(object sender, RoutedEventArgs e)
+        {
+            if (ds_p.Tables[0].Rows.Count == 0)
+            {
+                MessageBox.Show("没有数据");
+                return;
+            }
+            try
+            {
+                string sql = "insert into JSSX_ProductionPlan(cPNumber, cLine, cWorkShift, cPlanTime, cUniqueID, cJSSXInsideCode, iAmount, iSequence,bisNodemand) values ";
+
+                sql = sql + "('" + JXPONumber + "','" + sLine + "','" + Cbx_WorkShift.SelectedValue.ToString() + "','" + Cbx_Date.SelectedValue.ToString() + "','" + ds_p.Tables[0].Rows[0]["UniqueID"].ToString() + "','" + ds_p.Tables[0].Rows[0]["背番"].ToString() + "',' 0 ',' 1 ','" + ds_p.Tables[0].Rows[0]["特殊"].ToString() + "')";
+
+                sqlHelp.ExecuteNonQuery(sqlHelp.SQLCon, CommandType.Text, "update JSSX_ProductionPlan set isdelete = 1,dDeleteTime = getdate(),cLine = cLine + REPLACE( REPLACE( CONVERT(varchar(100), GETDATE(), 120),'-',''),':','') where cPNumber = '" + JXPONumber + "' and isdelete = 0");
+                int irow = sqlHelp.ExecuteNonQuery(sqlHelp.SQLCon, CommandType.Text, sql);
+                if (irow == 0)
+                {
+                    MessageBox.Show("删除失败，请联络IT");
+                }
+                else
+                {
+                    SqlParameter[] param = {
+                 new SqlParameter("@cPNumber", System.Data.SqlDbType.Char),
+                 new SqlParameter("@cPlanTime", System.Data.SqlDbType.Char),
+             };
+                    param[0].Value = JXPONumber;
+                    param[1].Value = Cbx_Date.SelectedValue.ToString();
+                    sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.StoredProcedure, "Logistics_Plan_Parts", param);
+
+                    MessageBox.Show("删除成功");
+                    Environment.Exit(0);
+
+
+
+                }
+            }
+            catch (Exception EX)
+            {
+                MessageBox.Show(EX.ToString());
+                
             }
         }
 

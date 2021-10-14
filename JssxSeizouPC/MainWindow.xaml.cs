@@ -1172,9 +1172,20 @@ namespace JssxSeizouPC
                 {
                     if (Res.Substring(0, 4) == "JXDP")
                     {
-                        Tb_PlanNo.Content = Res;
-                        DS_Show = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select a.* from master..spt_values  b left join (select top 30 ROW_NUMBER() over(order by InStocknumber) as ID,a.JssxInsideCode as 背番,TrayType+'__'+CarType+'__'+WorkShift+'__'+CONVERT(nvarchar(10) ,Amount) as 车型, Amount as 总量,QuantityCompletion as 完成,a.JssxCode as 社番,b.CarLabel as 铭板信息,a.CustomerCode as 客番,WorkShift as 班次,b.UniqueID as UID  from JSSX_Stock_In_Detailed as a left join [dbo].[JSSX_Products] as b on a.UniqueID=b.UniqueID and b.Revoked=0  where InStocknumber='" + Res + "' and isfinish=0 order by 班次 asc)  a  on a.ID = b.number where b.type='p' and number between 1 and 30 order by number");
-                        DS_30Days = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select distinct ScanResult,c.Status,KanbanNo,a.UniqueID,c.InStockNumber from [dbo].[JSSX_Stock_In_Detailed] a left join [dbo].[JSSX_Stock_In] b on a.InStockNumber = b.Number left join JSSX_ScanRecord_Seizou c on a.UniqueID = c.UniqueID  and c.ScanResult != 'EM' where a.instocknumber= '" + Res + "' and b.Isfinish is not null and c.ScanTime > dateadd(DAY, -15, getdate())");
+                        //select top 1 Number from JSSX_Stock_In where Number like  'JXDP2021101201V%' order by ID desc
+                        string ResTmp = Res.Substring(0, 15);
+                        DataSet DS_Number = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select top 1 Number from JSSX_Stock_In where Number like  '" + ResTmp + "' + '%' order by ID desc");
+                        if (DS_Number.Tables[0].Rows.Count == 0)
+                        {
+                            Tb_PlanNo.Content = "";
+                            ErrorSilen("空的计划，请联系日程。", "2");
+                            return;
+                        }
+
+                        string ResNumberNew = DS_Number.Tables[0].Rows[0]["Number"].ToString();
+                        Tb_PlanNo.Content = ResNumberNew;
+                        DS_Show = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select a.* from master..spt_values  b left join (select top 30 ROW_NUMBER() over(order by InStocknumber) as ID,a.JssxInsideCode as 背番,TrayType+'__'+CarType+'__'+WorkShift+'__'+CONVERT(nvarchar(10) ,Amount) as 车型, Amount as 总量,QuantityCompletion as 完成,a.JssxCode as 社番,b.CarLabel as 铭板信息,a.CustomerCode as 客番,WorkShift as 班次,b.UniqueID as UID  from JSSX_Stock_In_Detailed as a left join [dbo].[JSSX_Products] as b on a.UniqueID=b.UniqueID and b.Revoked=0  where InStocknumber='" + ResNumberNew + "' and isfinish=0 order by 班次 asc)  a  on a.ID = b.number where b.type='p' and number between 1 and 30 order by number");
+                        DS_30Days = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select distinct ScanResult,c.Status,KanbanNo,a.UniqueID,c.InStockNumber from [dbo].[JSSX_Stock_In_Detailed] a left join [dbo].[JSSX_Stock_In] b on a.InStockNumber = b.Number left join JSSX_ScanRecord_Seizou c on a.UniqueID = c.UniqueID  and c.ScanResult != 'EM' where a.instocknumber= '" + ResNumberNew + "' and b.Isfinish is not null and c.ScanTime > dateadd(DAY, -15, getdate())");
                         if (DS_Show.Tables[0].Rows.Count == 0)
                         {
                             Tb_PlanNo.Content = "";

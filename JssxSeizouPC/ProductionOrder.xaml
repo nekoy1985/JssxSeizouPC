@@ -5,19 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JssxSeizouPC"
         mc:Ignorable="d"
-        Title="ProductionOrder"  Height="746" Width="1024" >
+        Title="ProductionOrder"  Height="746" Width="1024" Closing="Window_Closing" Foreground="Black" >
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="75*"/>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="65*"/>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>            <RowDefinition Height="10*"/>            <RowDefinition Height="10*"/>            <RowDefinition Height="75*"/>            <RowDefinition Height="10*"/>            <RowDefinition Height="60*"/>            <RowDefinition Height="10*"/>            <RowDefinition Height="5*"/>            <RowDefinition Height="10*"/>            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -40,9 +32,9 @@
                 <local:NumericKeyboard x:Name="grqNumKB" />
             </Border>
         </Popup>
-        <DataGrid x:Name="DG_Production" Grid.Column="6" SelectionChanged="DG_Production_SelectionChanged"  Margin="0,0,0,0" Grid.RowSpan="3" AutoGenerateColumns="False"  Grid.Row="3" Grid.ColumnSpan="4">
+        <DataGrid x:Name="DG_Production" Grid.Column="6" SelectionChanged="DG_Production_SelectionChanged"  Margin="0,0,0,0" Grid.RowSpan="4" AutoGenerateColumns="False"  Grid.Row="3" Grid.ColumnSpan="4">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="UniqueID" IsReadOnly="True" Visibility="Collapsed" FontSize="20"  Binding="{Binding UniqueID}"/> 
+                <DataGridTextColumn Header="UniqueID" IsReadOnly="True" Visibility="Collapsed" FontSize="20"  Binding="{Binding UniqueID}"/>
                 <DataGridTextColumn Header="背番" IsReadOnly="True"  FontSize="20"  Binding="{Binding 背番}"/>
                 <DataGridTextColumn Header="类型" IsReadOnly="True"  FontSize="20"  Binding="{Binding 类型}"/>
                 <DataGridTextColumn Header="车型" IsReadOnly="True"  FontSize="20"  Binding="{Binding 车型}"/>
@@ -80,7 +72,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <DataGrid x:Name="DG_Now" IsReadOnly="True" Grid.ColumnSpan="4" Margin="0,0,0,0" Grid.Row="3" Grid.Column="1"/>
-        <DataGrid x:Name="DG_Next" IsReadOnly="True" Grid.ColumnSpan="4" Margin="0,0,0,0" Grid.Row="5" Grid.Column="1" Grid.RowSpan="2"/>
+        <DataGrid x:Name="DG_Next" IsReadOnly="True" Grid.ColumnSpan="4" Margin="0,0,0,0" Grid.Row="5" Grid.Column="1" Grid.RowSpan="3"/>
         <Label x:Name="label" Grid.ColumnSpan="4" Content="日程发布（以上选定班次）" FontSize="20" Foreground="Black" Grid.Column="1"  Margin="0,0,0,0" Grid.Row="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label x:Name="Lab_Label" Grid.ColumnSpan="4" Content="本  次  排  程" Foreground="Black"  Grid.Column="6"  Margin="0,0,0,0" FontSize="40" Grid.Row="1" Grid.RowSpan="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label x:Name="label2" Content="日期" Grid.Column="1"  Margin="0,0,0,0" Grid.Row="1" Foreground="Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
@@ -89,11 +81,11 @@
         <ComboBox x:Name="Cbx_Date" Grid.Column="2" Margin="0,0,0,0" Grid.Row="1" SelectionChanged="Cbx_Date_SelectionChanged"/>
         <ComboBox x:Name="Cbx_Date2" Grid.Column="4" Margin="0,0,0,0" Grid.Row="4" SelectionChanged="Cbx_Date2_SelectionChanged" />
         <Button x:Name="Btn_Nodemand" Content="(选中一行点我)设置成需要照合但不投料的状态" FontSize="20"  Grid.Column="6"  Margin="0,0,0,0" Grid.Row="6" Grid.ColumnSpan="4" Click="Btn_Nodemand_Click" />
-        <Button x:Name="Btn_UpDate" Content="提交" Grid.Column="9"  Margin="0,0,0,0" Grid.Row="7" Click="Btn_UpDate_Click" Height="36" VerticalAlignment="Top" />
-        <Button x:Name="Btn_Del" Content="移除" Grid.Column="8"  Margin="0,0,0,0" Grid.Row="7"  Height="36" VerticalAlignment="Top" Click="Btn_Del_Click" />
-        <Button x:Name="Btn_Add" Content="添加" Grid.Column="4"  Margin="0,0,0,0" Grid.Row="7" Click="Btn_Add_Click" />
-        <Button x:Name="Btn_Up" Content="上移↑" Grid.Column="6"  Margin="0,0,0,0" Grid.Row="7" Click="Btn_Up_Click" />
-        <Button x:Name="Btn_Down" Content="下移↓" Grid.Column="7"  Margin="0,0,0,0" Grid.Row="7" Click="Btn_Down_Click" />
-
+        <Button x:Name="Btn_UpDate" Content="提交" Grid.Column="9"  Margin="0,0,0,0" Grid.Row="8" Click="Btn_UpDate_Click" Height="36" VerticalAlignment="Top" />
+        <Button x:Name="Btn_Del" Content="移除" Grid.Column="8"  Margin="0,0,0,0" Grid.Row="8"  Height="36" VerticalAlignment="Top" Click="Btn_Del_Click" />
+        <Button x:Name="Btn_Add" Content="添加" Grid.Column="4"  Margin="0,0,0,0" Grid.Row="8" Click="Btn_Add_Click" />
+        <Button x:Name="Btn_Up" Content="上移↑" Grid.Column="6"  Margin="0,0,0,0" Grid.Row="8" Click="Btn_Up_Click" />
+        <Button x:Name="Btn_Down" Content="下移↓" Grid.Column="7"  Margin="0,0,0,0" Grid.Row="8" Click="Btn_Down_Click" />
+        <Button x:Name="Btn_Remove" Content="删除排班" Grid.Column="1"  Margin="0,0,0,0" Grid.Row="8"  Foreground="White" Background="Red" Click="Btn_Remove_Click" />
     </Grid>
 </Window>
