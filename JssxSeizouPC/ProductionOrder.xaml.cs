@@ -81,7 +81,7 @@ namespace JssxSeizouPC
         }
         private void Gvw_Set()
         {
-            string sql_Now = "select b.UniqueID,b.JSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,sum(b.Amount) as 计划数,iif(c.ismanufactured = 1,'是','否') as 照合,b.iSequence as 排序,a.Number from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber left join JSSX_Products c on b.UniqueID = c.UniqueID where a.Line = @Line and a.PlanTime =@PlanTime and a.Isfinish is not null  and b.Amount != 0 and b.WorkShift = @WorkShift  group by b.UniqueID,b.JSSXInsideCode,c.TrayType,c.CarType,b.iSequence,a.Number,c.ismanufactured  order by b.iSequence";
+            string sql_Now = "select b.UniqueID,b.JSSXInsideCode as 背番,c.TrayType as 类型,c.CarType as 车型,sum(b.Amount) as 计划数,iif(c.ismanufactured = 1,'是','否') as 照合,b.iSequence as 排序,a.Number from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber left join JSSX_Products c on b.UniqueID = c.UniqueID where a.Line = @Line and a.PlanTime =@PlanTime and a.Isfinish is not null and b.WorkShift = @WorkShift  group by b.UniqueID,b.JSSXInsideCode,c.TrayType,c.CarType,b.iSequence,a.Number,c.ismanufactured  order by b.iSequence";
             SqlParameter[] param_Now = {
                  new SqlParameter("@Line",    System.Data.SqlDbType.Char),
                  new SqlParameter("@PlanTime", System.Data.SqlDbType.Char),
@@ -447,7 +447,7 @@ namespace JssxSeizouPC
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Environment.Exit(0);
+            this.Hide(); ;
         }
 
 
@@ -498,7 +498,7 @@ namespace JssxSeizouPC
                     sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.StoredProcedure, "Logistics_Plan_Parts", param);
 
                     MessageBox.Show("提交成功");
-                    Environment.Exit(0);
+                    this.Hide(); ;
 
 
 
@@ -541,7 +541,7 @@ namespace JssxSeizouPC
                     sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.StoredProcedure, "Logistics_Plan_Parts", param);
 
                     MessageBox.Show("删除成功");
-                    Environment.Exit(0);
+                    this.Hide(); 
 
 
 

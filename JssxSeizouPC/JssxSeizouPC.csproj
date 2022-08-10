@@ -180,6 +180,9 @@
     <Compile Include="ProductionOrder.xaml.cs">
       <DependentUpon>ProductionOrder.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ResidualSet.xaml.cs">
+      <DependentUpon>ResidualSet.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ScrapRecord.xaml.cs">
       <DependentUpon>ScrapRecord.xaml</DependentUpon>
     </Compile>
@@ -236,6 +239,10 @@
     <Page Include="ProductionOrder.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ResidualSet.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ScrapRecord.xaml">
       <SubType>Designer</SubType>

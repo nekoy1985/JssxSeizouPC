@@ -8,6 +8,7 @@ using System.Management;
 using System.Media;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,7 +27,7 @@ namespace JssxSeizouPC
         #region 变量
         TextBox SelTB;
         private static int iWorkType = 0;//工作模式
-
+        private static string Mac = "";
         private static int iRow = 0, iProductSelection = -1;
         private DispatcherTimer timer, timer2, OpenComTimer, SpeedTest, tButtonLocker, Schedule, DTStatus;
         private string sCom1 = "";
@@ -79,6 +80,12 @@ namespace JssxSeizouPC
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
+            var ListMac = GetMac();
+            if (ListMac.Count >= 1)
+            {
+
+                Mac = ListMac[0];
+            }
             System.Configuration.ConfigurationManager.RefreshSection("appSettings");
             Lines = System.Configuration.ConfigurationManager.AppSettings["Lines"];
             bIsNewVersion = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["bIsNewVersion"]);
@@ -112,7 +119,9 @@ namespace JssxSeizouPC
 
             #region  上下机操作
             string LN = System.Configuration.ConfigurationManager.AppSettings["LinesName"];
-            string sql_Working = "select *,CONVERT(varchar(20), cStartTime, 120) as cTime from JSSX_Line_Working_Status where cEndTime is  null and cLineCode = '" + LN + "'";
+            //string sql_Working = "select *,CONVERT(varchar(20), cStartTime, 120) as cTime from JSSX_Line_Working_Status where cEndTime is  null and cLineCode = '" + LN + "'";
+            string sql_Working = "select top 1 *,CONVERT(varchar(20), cStartTime, 120) as cTime from JSSX_Line_Working_Status where cLineCode = '" + LN + "' order by ID desc  ";
+
             DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_Working);
             if (ds_Working.Tables[0].Rows.Count == 0)
             {
@@ -125,12 +134,25 @@ namespace JssxSeizouPC
             }
             else
             {
-                //上机状态，显示下机文字
-                Btn_Shutdown.Content = "■下机";
-                Btn_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF0000"));
+                if (ds_Working.Tables[0].Rows[0]["cEndTime"].ToString() == "")    //还没下机，表示当前上机状态
+                {
+                    //上机状态，显示下机文字
+                    Btn_Shutdown.Content = "■下机";
+                    Btn_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF0000"));
 
-                Lab_Shutdown.Content = "当前状态：运行中 " + ds_Working.Tables[0].Rows[0]["cTime"].ToString();
-                Lab_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF00FF00"));
+                    Lab_Shutdown.Content = "当前状态：运行中 " + ds_Working.Tables[0].Rows[0]["cTime"].ToString();
+                    Lab_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF00FF00"));
+
+                }
+                else
+                {
+                    //下机状态，显示上机文字
+                    Btn_Shutdown.Content = "▶上机";
+                    Btn_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF00FF00"));
+                    Lab_Shutdown.Content = "当前状态：停止中";
+                    Lab_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF0000"));
+
+                }
 
             }
             #endregion  
@@ -146,12 +168,12 @@ namespace JssxSeizouPC
             {//按了之后上机
 
 
-                string sql_Working = "insert into JSSX_Line_Working_Status(iStatusCode, cLineCode, cStartTime,cDate,cWorkShift) values(1, '" + LN + "', GETDATE(),iif(right(CONVERT(varchar(20),getdate(),120),8) <='07:45:00', CONVERT(varchar(10),DATEADD(day,-1,getdate()),120),CONVERT(varchar(10),getdate(),120)),iif(right( CONVERT(varchar(20), getdate(),120),8) between '07:45:00' and '19:45:00' ,'D','N'))";
+                string sql_Working = "insert into JSSX_Line_Working_Status(iStatusCode, cLineCode, cStartTime,cDate,cWorkShift,cMac) values(1, '" + LN + "', GETDATE(),iif(right(CONVERT(varchar(20),getdate(),120),8) <='07:45:00', CONVERT(varchar(10),DATEADD(day,-1,getdate()),120),CONVERT(varchar(10),getdate(),120)),iif(right( CONVERT(varchar(20), getdate(),120),8) between '07:45:00' and '19:45:00' ,'D','N'),'" + Mac + "')";
                 DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_Working);
                 Btn_Shutdown.Content = "■下机";
                 Btn_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF0000"));
                 //下机改成获取最后一台的时间
-                string sql_WorkingTime = "select *,CONVERT(varchar(20), cStartTime, 120) as cTime from JSSX_Line_Working_Status where cEndTime is  null and cLineCode = '" + LN + "'";
+                string sql_WorkingTime = "select top 1 *,CONVERT(varchar(20), cStartTime, 120) as cTime from JSSX_Line_Working_Status where cLineCode = '" + LN + "' order by ID desc ";
                 DataSet ds_WorkingTime = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_WorkingTime);
 
                 Lab_Shutdown.Content = "当前状态：运行中 " + ds_WorkingTime.Tables[0].Rows[0]["cTime"].ToString();
@@ -160,7 +182,7 @@ namespace JssxSeizouPC
             }
             else
             {//按了之后下机
-                string sql_Working = "update JSSX_Line_Working_Status set iStatusCode = 2, cEndTime = GETDATE() where cLineCode = '" + LN + "' and iStatusCode = 1";
+                string sql_Working = "update JSSX_Line_Working_Status set iStatusCode = 2, cEndTime = GETDATE(),cMac = cMac + ',END:" + Mac + "' where cLineCode = '" + LN + "' and cEndTime is null";
                 //string sql_Working = "update JSSX_Line_Working_Status set iStatusCode = 2, cEndTime = (select top 1 ScanTime from JSSX_ScanRecord_Seizou a  where a.Logger = '" + Lines + "' order by ID desc) where cLineCode = '" + LN + "' and iStatusCode = 1";
                 DataSet ds_Working = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, sql_Working);
                 Btn_Shutdown.Content = "▶上机";
@@ -168,13 +190,17 @@ namespace JssxSeizouPC
                 Lab_Shutdown.Content = "当前状态：停止中";
                 Lab_Shutdown.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF0000"));
 
-                SqlParameter[] param = {
+                if (Tb_PlanNo.Content != null)     //防止选了没计划的日子报错
+                {
+                    SqlParameter[] param = {
                  new SqlParameter("@InStockNumber", System.Data.SqlDbType.Char),
                  new SqlParameter("@cLine", System.Data.SqlDbType.Char),
              };
-                param[0].Value = Tb_PlanNo.Content.ToString();
-                param[1].Value = Lines;
-                sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.StoredProcedure, "LineShutdown", param);   //下机时执行存储过程，功能1，刷新计划表里的完成条数，功能2，判断OK条数有没有缺漏
+                    param[0].Value = Tb_PlanNo.Content.ToString();
+                    param[1].Value = Lines;
+                    sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.StoredProcedure, "LineShutdown", param);   //下机时执行存储过程，功能1，刷新计划表里的完成条数，功能2，判断OK条数有没有缺漏
+
+                }
 
 
             }
@@ -300,7 +326,7 @@ namespace JssxSeizouPC
             if (((TSNow > TSDayS && TSNow < TSDayE) || (TSNow > TSNightS && TSNow < TSNightE)) && bIsNewVersion)
             {
                 string LN = System.Configuration.ConfigurationManager.AppSettings["LinesName"];
-                DataSet DS_Schedule = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select distinct aa.cPNumber,bb.cWorkShift from (select distinct 'JXPO' + right(left(a.Number, 14), 10) + b.WorkShift as cPNumber from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber where a.Line =  '" + LN + "' and (b.WorkShift = 'D' or b.WorkShift = 'N') and CONVERT(varchar(10), a.PlanTime, 120) + b.WorkShift > iif(right(CONVERT(varchar(20), GETDATE(), 120),8) between '00:00:00' and '08:00:00',CONVERT(varchar(10), dateadd(day,-1,GETDATE()), 120),CONVERT(varchar(10), GETDATE(), 120) ) + iif(right(CONVERT(varchar(20), GETDATE(), 120), 8) between '08:00:00' and '19:59:59', 'D', 'N') and a.Isfinish = 0) aa left join JSSX_ProductionPlan bb on aa.cPNumber = bb.cPNumber and bb.isdelete = 0 order by aa.cPNumber");
+                DataSet DS_Schedule = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select distinct aa.cPNumber,bb.cWorkShift from (select distinct 'JXPO' + right(left(a.Number, 14), 10) + b.WorkShift as cPNumber from JSSX_Stock_In a left join JSSX_Stock_In_Detailed b on a.Number = b.InStockNumber where  b.Amount != 0 and a.Line =  '" + LN + "' and (b.WorkShift = 'D' or b.WorkShift = 'N') and CONVERT(varchar(10), a.PlanTime, 120) + b.WorkShift > iif(right(CONVERT(varchar(20), GETDATE(), 120),8) between '00:00:00' and '08:00:00',CONVERT(varchar(10), dateadd(day,-1,GETDATE()), 120),CONVERT(varchar(10), GETDATE(), 120) ) + iif(right(CONVERT(varchar(20), GETDATE(), 120), 8) between '08:00:00' and '19:59:59', 'D', 'N') and a.Isfinish = 0) aa left join JSSX_ProductionPlan bb on aa.cPNumber = bb.cPNumber and bb.isdelete = 0 order by aa.cPNumber");
 
                 if (DS_Schedule != null && DS_Schedule.Tables[0].Rows.Count != 0 && DS_Schedule.Tables[0].Rows[0][1] != null && DS_Schedule.Tables[0].Rows[0][1].ToString() == "")
                 {
@@ -863,6 +889,36 @@ namespace JssxSeizouPC
         #region 方法 
 
         /// <summary>
+        /// 获取MAC地址
+        /// </summary>
+        /// <returns></returns>
+        private List<string> GetMac()
+        {
+            var macs = new List<string>();
+
+            var interfaces = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (var @interface in interfaces)
+            {
+                var up = @interface.OperationalStatus == OperationalStatus.Up;
+                var loopback = @interface.NetworkInterfaceType == NetworkInterfaceType.Loopback;
+
+                if (up && !loopback)
+                {
+                    var address = @interface.GetPhysicalAddress().ToString();
+
+                    // insert ":" then remove the last ":"
+                    var result = Regex.Replace(address, ".{2}", "$0:");
+                    var mac = result.Remove(result.Length - 1);
+
+                    macs.Add(mac);
+                }
+            }
+            return macs;
+        }
+
+
+
+        /// <summary>
         /// 托盘扫描
         /// </summary>
         /// <param name="Res">托盘二维码的编号</param>
@@ -898,6 +954,28 @@ namespace JssxSeizouPC
             Lab_Container.Content = "托盘号：" + Res;   //把托盘号显示在界面上
 
         }
+
+        private void Btn_Residual_Click(object sender, RoutedEventArgs e)
+        {
+            DataRowView DataRow = (DataRowView)Cbx_ProductSelection.SelectedItem;
+            if (DataRow == null)
+            {
+                MessageBox.Show("未选择车型，请进入页面后使用全部部品的按钮");
+                ResidualSet lo = new ResidualSet(System.Configuration.ConfigurationManager.AppSettings["LinesName"], null);
+                lo.ShowDialog();
+
+
+            }
+            else
+            {
+                string sUID = DataRow["UID"].ToString();
+
+                ResidualSet lo = new ResidualSet(System.Configuration.ConfigurationManager.AppSettings["LinesName"], sUID);
+                lo.ShowDialog();
+            }
+
+        }
+
 
 
 
@@ -1605,7 +1683,7 @@ namespace JssxSeizouPC
             Speaker("看板重制成功", 4);
             ShowMessage("看板重制成功。" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
             SN = "";
-
+            ResetKanban();
         }
 
         /// <summary>
@@ -1694,7 +1772,9 @@ namespace JssxSeizouPC
             }
             else
             {
-                sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "KanbanSC '" + sBKN + "'");
+               // sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "KanbanSC '" + sBKN + "'");
+                sqlHelp.ExecuteSqlTran(sqlHelp.SQLCon, "KanbanSC2 '" + sBKN + "','" + Lines + "'");
+
                 ShowMessage("此看板内的产品已经全部退库。" + "-----" + DateTime.Now.ToString("HH:mm:ss"));
                 Speaker("成功啦成功啦你是真的成功啦，整张都给你退掉了，你好棒棒。", 1);
             }
@@ -1969,7 +2049,7 @@ namespace JssxSeizouPC
             try
             {
                 DataSet DS_Plan = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select distinct top 1  instocknumber  from [dbo].[JSSX_Stock_In_Detailed] a left join [dbo].[JSSX_Stock_In] b on a.InStockNumber=b.Number " +
-                    " where left(right(instocknumber,13),8)=iif(right(CONVERT([nvarchar](16),getdate(),(120)),5)>'00:00' and right(CONVERT([nvarchar](16),getdate(),(120)),5)<'07:45' ,CONVERT([nvarchar](8),getdate()-1,(112)),CONVERT([nvarchar](8),getdate(),(112))) and left(right(instocknumber,5),2)= '" + LineNo + "' and b.Isfinish is not null");
+                    " where left(right(instocknumber,13),8)=iif(right(CONVERT([nvarchar](16),getdate(),(120)),5)>='00:00' and right(CONVERT([nvarchar](16),getdate(),(120)),5)<'07:45' ,CONVERT([nvarchar](8),getdate()-1,(112)),CONVERT([nvarchar](8),getdate(),(112))) and left(right(instocknumber,5),2)= '" + LineNo + "' and b.Isfinish is not null");
                 //获取日计划
                 if (DS_Plan.Tables[0].Rows.Count > 0)
                 {

@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace JssxSeizouPC
 {
@@ -35,68 +34,6 @@ namespace JssxSeizouPC
                 }
             }
             InitializeComponent();
-            DataSet ds_Line = sqlHelp.ExecuteDataSet(sqlHelp.SQLCon, CommandType.Text, "select LineName,LineNumber from JSSX_Line where cArea = '后工段' or  cArea = '后虚拟' order by iLineSequence");
-            int LineCount = ds_Line.Tables[0].Rows.Count;
-
-            double dGridLine = Math.Sqrt(LineCount + 1);
-            int iGridBtn = int.Parse(Math.Ceiling(dGridLine).ToString());   //每一行，每一列放几个按钮 （总行数加一个退出按钮，开根号后向上取整）
-
-
-            for (int i = 0; i < iGridBtn; i++)      //画纵向格子（4个格子循环写4次）
-            {
-                var Cell1 = new RowDefinition();
-                Cell1.Height = new GridLength(1, GridUnitType.Star);
-                WinGrid.RowDefinitions.Add(Cell1);
-            }
-
-            for (int i = 0; i < iGridBtn; i++)         //画横向格子
-            {
-                var Cell1 = new ColumnDefinition();
-                Cell1.Width = new GridLength(1, GridUnitType.Star);
-                WinGrid.ColumnDefinitions.Add(Cell1);
-            }
-
-            int iRow = 0, iCol = 0;
-
-            //循环绘制按钮
-            foreach (DataRow rows in ds_Line.Tables[0].Rows)
-            {
-                Button NewBtn = new Button();
-                NewBtn.Name = "Btn_Line" + rows["LineNumber"].ToString();
-                NewBtn.Content = rows["LineName"].ToString();
-                NewBtn.ToolTip = rows["LineNumber"].ToString();
-                NewBtn.FontSize = 20;
-                NewBtn.Foreground = new SolidColorBrush(Colors.Aqua);
-                NewBtn.Margin = new Thickness(10, 10, 10, 10);
-                NewBtn.Click += Btn_Line_Click;
-
-                WinGrid.Children.Add(NewBtn);
-
-                Grid.SetRow(NewBtn, iRow);
-                Grid.SetColumn(NewBtn, iCol);
-                iCol++;
-                if (iCol >= iGridBtn)  //换行
-                {
-                    iCol = 0;
-                    iRow++;
-                }
-
-
-            }
-            //绘制退出按钮
-            Button NewBtn2 = new Button();
-            NewBtn2.Name = "Btn_Close";
-            NewBtn2.Content = "退出";
-            NewBtn2.ToolTip = 999;
-            NewBtn2.FontSize = 20;
-            NewBtn2.Foreground = new SolidColorBrush(Colors.Red);
-            NewBtn2.Margin = new Thickness(10, 10, 10, 10);
-            NewBtn2.Click += Btn_Close_Click;
-
-            WinGrid.Children.Add(NewBtn2);
-
-            Grid.SetRow(NewBtn2, iGridBtn - 1);
-            Grid.SetColumn(NewBtn2, iGridBtn - 1);
 
         }
 

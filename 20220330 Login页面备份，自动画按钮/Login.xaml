@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="登陆" Height="500" Width="500"  WindowStartupLocation="CenterScreen" WindowStyle="None" Topmost="True" Icon="JssxSeizouPC.ico" ResizeMode="NoResize" >
     <Window.Resources>
-        <Style x:Name="OuterGlowStyle" TargetType="Button">
+        <Style x:Key="OuterGlowStyle" TargetType="Button">
             <Setter Property="Background"  Value="Black"/>
             <Setter Property="BorderBrush"  Value="Aqua"/>
             <Setter Property="Effect">
@@ -18,11 +18,7 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid Name="WinGrid">
-
-    </Grid>
-
-    <!--<Grid>
+    <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="2.5*"/>
@@ -48,10 +44,9 @@
         <Button x:Name="Btn_Line9" Style="{StaticResource OuterGlowStyle}"  Content="五线"  Foreground="Aqua" ToolTip="9" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="2" Grid.Column="0" Click="Btn_Line_Click" />
         <Button x:Name="Btn_Line10" Style="{StaticResource OuterGlowStyle}"  Content="RP线"  Foreground="Aqua" ToolTip="10" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="2" Grid.Column="1" Click="Btn_Line_Click" />
         <Button x:Name="Btn_Line11" Style="{StaticResource OuterGlowStyle}"  Content="RP2线"  Foreground="Aqua" ToolTip="11" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="2" Grid.Column="2" Click="Btn_Line_Click" />
-        <Button x:Name="Btn_Line97" Style="{StaticResource OuterGlowStyle}"  Content="虚拟线"  Foreground="Aqua" ToolTip="97" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="2" Grid.Column="3" Click="Btn_Line_Click" />
 
         <Button x:Name="Btn_Close" Style="{StaticResource OuterGlowStyle}"  Content="退出"  Foreground="red" ToolTip="9" VerticalContentAlignment="Center"  FontSize="20" Margin="10" Grid.Row="3" Grid.Column="3" Click="Btn_Close_Click" />
 
 
-    </Grid>-->
+    </Grid>
 </Window>
